@@ -7,7 +7,21 @@
     using Newtonsoft.Json;
 
     /// <summary>
+    /// <para>
     /// Concrete resource import parser for JSON
+    /// </para>
+    /// <para>JSON resource imports look like this</para>
+    /// <code>
+    /// [
+    ///     {
+    ///         "ResourceType":"AWS::DynamoDB::Table",
+    ///         "LogicalResourceId":"GamesTable",
+    ///         "ResourceIdentifier": {
+    ///             "TableName":"Games"
+    ///         }
+    ///     }
+    /// ]
+    /// </code>
     /// </summary>
     /// <seealso cref="ResourceImportParser" />
     internal class JsonResourceImportParser : ResourceImportParser

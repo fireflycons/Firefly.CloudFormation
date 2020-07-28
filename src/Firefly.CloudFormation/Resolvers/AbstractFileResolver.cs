@@ -29,21 +29,23 @@
         }
 
         /// <summary>
-        /// Gets or sets the artifact content, used to populate Body properties of stack request objects.
+        /// Gets the artifact content. This will be <c>null</c> if the artifact is in S3
+        /// or the text content as per <see cref="FileContent" /> if the artifact is local.
         /// </summary>
         /// <value>
-        /// The artifact content, which will be <c>null</c> if the artifact is located in S3 or Use Previous Template is selected for updates.
+        /// The artifact content
         /// </value>
         public string ArtifactContent =>
             (this.Source & (InputFileSource.S3 | InputFileSource.UsePreviousTemplate)) != 0 ? null : this.FileContent;
 
         /// <summary>
-        /// Gets the file URL, used to populate URL properties of stack request objects.
+        /// Gets the URL of an artifact located in S3.
         /// </summary>
         /// <value>
-        /// The file URL, which will be <c>null</c> if the file is not located in S3.
+        /// The file URL. If not <c>null</c>, then this should be passed to CloudFormation
         /// </value>
-        // ReSharper disable once StyleCop.SA1623
+
+        // ReSharper disable once StyleCop.SA1623        
         public string ArtifactUrl { get; protected set; }
 
         /// <summary>
@@ -65,11 +67,12 @@
         public string InputFileName { get; private set; }
 
         /// <summary>
-        /// Gets the file's source.
+        /// Gets how the artifact should be sourced.
         /// </summary>
         /// <value>
         /// The source.
         /// </value>
+
         // ReSharper disable once StyleCop.SA1623
         public InputFileSource Source { get; protected set; }
 
@@ -99,22 +102,12 @@
         protected abstract int MaxFileSize { get; }
 
         /// <summary>
-        /// Resets the template source if an oversize asset was uploaded to S3.
-        /// </summary>
-        /// <param name="uploadedArtifactUri">The uploaded artifact URI.</param>
-        public void ResetTemplateSource(string uploadedArtifactUri)
-        {
-            this.Source = InputFileSource.S3;
-            this.ArtifactUrl = uploadedArtifactUri;
-        }
-
-        /// <summary>
         /// Resolves the given artifact location (template or policy) from text input
         /// uploading it to S3 if the object is larger than the maximum size for
         /// body text supported by the CloudFormation API.
         /// </summary>
         /// <param name="context">The context for logging.</param>
-        /// <param name="objectToResolve">The object to resolve.</param>
+        /// <param name="objectToResolve">The object to resolve - either plain text, a path or an S3 location</param>
         /// <param name="stackName">Name of the stack.</param>
         /// <returns>
         /// Result of the resolution.
@@ -126,8 +119,7 @@
         {
             var result = new ResolutionResult();
 
-            // Nasty, but really want out arguments here.
-            this.ResolveFileAsync(objectToResolve).Wait();
+            await this.ResolveFileAsync(objectToResolve);
 
             var fileType = this is TemplateResolver ? UploadFileType.Template : UploadFileType.Policy;
 
@@ -306,6 +298,16 @@
             {
                 this.Source |= InputFileSource.Oversize;
             }
+        }
+
+        /// <summary>
+        /// Resets the template source if an oversize asset was uploaded to S3.
+        /// </summary>
+        /// <param name="uploadedArtifactUri">The uploaded artifact URI.</param>
+        private void ResetTemplateSource(string uploadedArtifactUri)
+        {
+            this.Source = InputFileSource.S3;
+            this.ArtifactUrl = uploadedArtifactUri;
         }
     }
 }

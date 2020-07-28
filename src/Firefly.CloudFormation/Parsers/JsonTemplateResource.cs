@@ -11,7 +11,7 @@
     /// Concrete <see cref="TemplateResource"/> for JSON templates
     /// </summary>
     /// <seealso cref="TemplateResource" />
-    public class JsonTemplateResource : TemplateResource
+    internal class JsonTemplateResource : TemplateResource
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="JsonTemplateResource"/> class.

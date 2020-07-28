@@ -14,7 +14,7 @@
         private static readonly string[] Quotes = { "'", "\"" };
 
         /// <summary>
-        /// Remove quotes from string if present
+        /// Remove leading and trailing quote from string if present, i.e. <c>&quot;I am quoted&quot;</c> =&gt; <c>I am quoted</c>
         /// </summary>
         /// <param name="self">The self.</param>
         /// <returns>Unquoted string</returns>

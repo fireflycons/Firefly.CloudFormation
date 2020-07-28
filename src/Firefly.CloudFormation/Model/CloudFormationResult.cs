@@ -1,12 +1,17 @@
 ﻿namespace Firefly.CloudFormation.Model
 {
     /// <summary>
+    /// <para>
     /// Result object returned by Create/Update/Delete/Reset methods
+    /// </para>
+    /// <para>
+    /// See also <seealso cref="CloudFormationRunner"/>
+    /// </para>
     /// </summary>
     public class CloudFormationResult
     {
         /// <summary>
-        /// Gets the stack ARN.
+        /// Gets the ARN of the stack being modified.
         /// </summary>
         /// <value>
         /// The stack ARN.

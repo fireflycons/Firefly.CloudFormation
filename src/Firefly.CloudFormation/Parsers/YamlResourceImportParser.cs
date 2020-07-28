@@ -8,7 +8,16 @@
     using YamlDotNet.Serialization;
 
     /// <summary>
+    /// <para>
     /// Concrete resource import parser for YAML
+    /// </para>
+    /// <para>YAML resource imports look like this</para>
+    /// <code>
+    /// - ResourceType: AWS::DynamoDB::Table
+    ///   LogicalResourceId: GamesTable
+    ///   ResourceIdentifier:
+    ///     TableName: Games
+    /// </code>
     /// </summary>
     /// <seealso cref="ResourceImportParser" />
     internal class YamlResourceImportParser : ResourceImportParser

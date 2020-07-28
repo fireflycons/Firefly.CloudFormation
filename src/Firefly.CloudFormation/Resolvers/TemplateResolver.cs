@@ -58,7 +58,8 @@
         protected override int MaxFileSize { get; } = 51200;
 
         /// <summary>
-        /// Resolves and loads the given file from the specified location
+        /// Resolves and loads the given file from the specified location,
+        /// including from CloudFormation itself if called for a UsePreviousTemplate update.
         /// </summary>
         /// <param name="objectLocation">The file location.</param>
         /// <returns>

@@ -12,34 +12,34 @@
     using YamlDotNet.Serialization;
 
     /// <summary>
-    /// Base class for CLoudFormation template parsers.
+    /// Base class for CloudFormation template parsers.
     /// </summary>
     public abstract class TemplateParser : InputFileParser
     {
         /// <summary>
         /// The description key name
         /// </summary>
-        protected const string DescriptionKeyName = "Description";
+        internal const string DescriptionKeyName = "Description";
 
         /// <summary>
         /// Amount of padding to add to resource names to include random chars added by CloudFormation
         /// </summary>
-        protected const int NestedStackPadWidth = 14;
+        internal const int NestedStackPadWidth = 14;
 
         /// <summary>
         /// The nested stack type
         /// </summary>
-        protected const string NestedStackType = "AWS::CloudFormation::Stack";
+        internal const string NestedStackType = "AWS::CloudFormation::Stack";
 
         /// <summary>
         /// The parameter key name
         /// </summary>
-        protected const string ParameterKeyName = "Parameters";
+        internal const string ParameterKeyName = "Parameters";
 
         /// <summary>
         /// The resource key name
         /// </summary>
-        protected const string ResourceKeyName = "Resources";
+        internal const string ResourceKeyName = "Resources";
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TemplateParser"/> class.
@@ -51,7 +51,7 @@
         }
 
         /// <summary>
-        /// Creates a Cloud Formation template parser.
+        /// Creates a parser subclass of the appropriate type for the input content.
         /// </summary>
         /// <param name="templateBody">The template body.</param>
         /// <returns>A new <see cref="TemplateParser"/></returns>
@@ -59,7 +59,7 @@
         public static TemplateParser Create(string templateBody)
         {
             // ReSharper disable once SwitchStatementHandlesSomeKnownEnumValuesWithDefault
-            switch (GetInputFileFormat(templateBody))
+            switch (InputFileParser.GetInputFileFormat(templateBody))
             {
                 case SerializationFormat.Json:
 

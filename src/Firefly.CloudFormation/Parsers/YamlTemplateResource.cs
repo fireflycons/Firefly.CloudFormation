@@ -11,7 +11,7 @@
     /// Concrete <see cref="TemplateResource"/> for YAML templates
     /// </summary>
     /// <seealso cref="TemplateResource" />
-    public class YamlTemplateResource : TemplateResource
+    internal class YamlTemplateResource : TemplateResource
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="YamlTemplateResource"/> class.

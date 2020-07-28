@@ -10,7 +10,8 @@
     public interface IInputFileResolver
     {
         /// <summary>
-        /// Gets the artifact content. This will be <c>null</c> if the artifact is in S3.
+        /// Gets the artifact content. This will be <c>null</c> if the artifact is in S3
+        /// or the text content as per <see cref="FileContent"/> if the artifact is local.
         /// </summary>
         /// <value>
         /// The artifact content
@@ -18,7 +19,7 @@
         string ArtifactContent { get; }
 
         /// <summary>
-        /// Gets the file body - wherever it is located.
+        /// Gets the text content of the file - wherever it is located.
         /// </summary>
         /// <value>
         /// The file body.
@@ -26,7 +27,7 @@
         string FileContent { get; }
 
         /// <summary>
-        /// Gets the file URL.
+        /// Gets the URL of an artifact located in S3.
         /// </summary>
         /// <value>
         /// The file URL. If not <c>null</c>, then this should be passed to CloudFormation
@@ -34,7 +35,7 @@
         string ArtifactUrl { get; }
 
         /// <summary>
-        /// Gets how the file should be sourced.
+        /// Gets how the artifact should be sourced.
         /// </summary>
         /// <value>
         /// The source.
@@ -54,7 +55,7 @@
         /// body text supported by the CloudFormation API.
         /// </summary>
         /// <param name="context">The context for logging.</param>
-        /// <param name="objectToResolve">The object to resolve.</param>
+        /// <param name="objectToResolve">The object to resolve - either a local file path, or string content.</param>
         /// <param name="stackName">Name of the stack.</param>
         /// <returns>Result of the resolution.</returns>
         Task<ResolutionResult> ResolveArtifactLocationAsync(

@@ -12,7 +12,14 @@ namespace Firefly.CloudFormation.Model
 
     using Firefly.CloudFormation.Utils;
 
-    /// <summary>Builder pattern implementation for <see cref="CloudFormationRunner"/></summary>
+    /// <summary>
+    /// <para>
+    /// Builder pattern implementation for <see cref="CloudFormationRunner"/>
+    /// </para>
+    /// <para>
+    /// A builder is constructed by calling the static method <see cref="CloudFormationRunner.Builder"/>
+    /// </para>
+    /// </summary>
     public class CloudFormationBuilder
     {
         /// <summary>The CloudFormation context</summary>
@@ -124,7 +131,7 @@ namespace Firefly.CloudFormation.Model
         /// </summary>
         /// <param name="context">The context.</param>
         /// <param name="stackName">Name of the stack.</param>
-        public CloudFormationBuilder(ICloudFormationContext context, string stackName)
+        internal CloudFormationBuilder(ICloudFormationContext context, string stackName)
         {
             this._cloudFormationContext = context ?? throw new ArgumentNullException(nameof(context));
             this._stackName = stackName ?? throw new ArgumentNullException(nameof(stackName));

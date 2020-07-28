@@ -1,7 +1,12 @@
 ﻿namespace Firefly.CloudFormation.Model
 {
     /// <summary>
+    /// <para>
     /// Data serialization format for templates, policies etc.
+    /// </para>
+    /// <para>
+    /// See also <seealso cref="Firefly.CloudFormation.Parsers.InputFileParser"/>
+    /// </para>
     /// </summary>
     public enum SerializationFormat
     {

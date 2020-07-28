@@ -1,7 +1,7 @@
 ﻿namespace Firefly.CloudFormation.Model
 {
     /// <summary>
-    /// Returned by run method of <see cref="CloudFormationRunner"/>
+    /// Returned as one of the properties of <see cref="CloudFormationResult"/>
     /// </summary>
     public enum StackOperationResult
     {

@@ -8,10 +8,23 @@
     using Newtonsoft.Json.Linq;
 
     /// <summary>
+    /// <para>
     /// Parser for JSON parameter files
+    /// </para>
+    /// <para>
+    /// JSON parameter files look like this
+    /// <code>
+    /// [
+    ///     {
+    ///         "ParameterKey": "MyParameterName",
+    ///         "ParameterValue": "MyParameterValue"
+    ///     }
+    /// ]
+    /// </code>
+    /// </para>
     /// </summary>
     /// <seealso cref="ParameterFileParser" />
-    public class JsonParameterFileParser : ParameterFileParser
+    internal class JsonParameterFileParser : ParameterFileParser
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="JsonParameterFileParser"/> class.
@@ -23,14 +36,7 @@
         }
 
         /// <summary>
-        /// <para>
-        /// Parses a parameter file.
-        /// </para>
-        /// <para>
-        /// This is a JSON or YAML list of parameter structures with fields <c>ParameterKey</c> and <c>ParameterValue</c>.
-        /// This is similar to <c>aws cloudformation create-stack</c>  except the other fields defined for that are ignored here.
-        /// Parameters not supplied to an update operation are assumed to be <c>UsePreviousValue</c>.
-        /// </para>
+        /// Parses a JSON parameter file.
         /// </summary>
         /// <returns>
         /// A dictionary of parameter key-value pairs

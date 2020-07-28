@@ -8,7 +8,26 @@
     using Firefly.CloudFormation.Model;
 
     /// <summary>
+    /// <para>
     /// Base class for Resource Import file parsers
+    /// </para>
+    /// <para>
+    /// Resource Import files contain a JSON or YAML list of resource import structures which look like this (JSON)
+    /// <code>
+    /// [
+    ///     {
+    ///         "ResourceType":"AWS::DynamoDB::Table",
+    ///         "LogicalResourceId":"GamesTable",
+    ///         "ResourceIdentifier": {
+    ///             "TableName":"Games"
+    ///         }
+    ///     }
+    /// ]
+    /// </code>
+    /// </para>
+    /// <para>
+    /// See <seealso href="https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/resource-import-existing-stack.html"/> for information on resource import data structure.
+    /// </para>
     /// </summary>
     /// <seealso cref="InputFileParser" />
     public abstract class ResourceImportParser : InputFileParser
@@ -23,7 +42,7 @@
         }
 
         /// <summary>
-        /// Creates the parser.
+        /// Creates a parser subclass of the appropriate type for the input content.
         /// </summary>
         /// <param name="fileContent">Content of the file.</param>
         /// <returns>A new <see cref="ResourceImportParser"/>.</returns>

@@ -3,7 +3,12 @@
     using System;
 
     /// <summary>
+    /// <para>
     /// Specifies location of an input for CloudFormation operations.
+    /// </para>
+    /// <para>
+    /// see also <seealso cref="Firefly.CloudFormation.Resolvers.AbstractFileResolver"/>.
+    /// </para>
     /// </summary>
     [Flags]
     public enum InputFileSource
@@ -34,7 +39,12 @@
         UsePreviousTemplate = 8,
 
         /// <summary>
+        /// <para>
         /// Local file or string, but needs to be uploaded first.
+        /// </para>
+        /// <para>
+        /// This flag may be set in conjunction with <value>File</value> or <value>String</value>.
+        /// </para>
         /// </summary>
         Oversize = 16
     }
