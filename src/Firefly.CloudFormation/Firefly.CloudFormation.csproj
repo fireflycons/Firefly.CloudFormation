@@ -1,9 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Description>This library provides a nicer interface for managing AWS CloudFormation stacks.</Description>
+    <Copyright>Copyright (c) 2020 Firefly Consulting Ltd.</Copyright>
+    <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <PackageProjectUrl>https://github.com/fireflycons/Firefly.CloudFormation</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/fireflycons/Firefly.CloudFormation.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>AWS;CloudFormation</PackageTags>
+    <Authors>Alistair Mackay</Authors>
+    <Company>Firefly IT Consulting</Company>
+    <Version>0.0.1</Version>
+    <AssemblyVersion>0.0.0.0</AssemblyVersion>
+    <FileVersion>0.0.1.0</FileVersion>
   </PropertyGroup>
-
   <ItemGroup>
     <PackageReference Include="AWSSDK.CloudFormation" Version="3.3.104.11" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
@@ -11,9 +24,7 @@
     <PackageReference Include="Polly.Contrib.WaitAndRetry" Version="1.1.1" />
     <PackageReference Include="YamlDotNet" Version="7.0.0" />
   </ItemGroup>
-
   <ItemGroup>
-    <Folder Include="S3\" />
+    <None Include="..\..\LICENSE" Pack="true" PackagePath="" />
   </ItemGroup>
-
 </Project>

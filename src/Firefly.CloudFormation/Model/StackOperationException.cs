@@ -62,6 +62,12 @@
         {
         }
 
+        /// <summary>
+        /// Gets the stack object if one was passed to the constructor.
+        /// </summary>
+        /// <value>
+        /// The stack.
+        /// </value>
         public Stack Stack { get; }
     }
 }
