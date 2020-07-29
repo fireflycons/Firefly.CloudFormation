@@ -8,8 +8,6 @@
     using System.Threading.Tasks;
 
     using Firefly.CloudFormation.Model;
-    using Firefly.CloudFormation.S3;
-    using Firefly.CloudFormation.Utils;
 
     /// <summary>
     /// Abstract file resolver class for resolving template or policy content from file, S3 or string body

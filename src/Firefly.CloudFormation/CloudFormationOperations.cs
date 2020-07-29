@@ -9,7 +9,6 @@
     using Amazon.CloudFormation.Model;
 
     using Firefly.CloudFormation.Model;
-    using Firefly.CloudFormation.Utils;
 
     /// <summary>
     /// Contains methods for operations on stacks that are not related to applying templates

@@ -1,4 +1,4 @@
-﻿namespace Firefly.CloudFormation.S3
+﻿namespace Firefly.CloudFormation
 {
     using System;
     using System.Threading.Tasks;
@@ -21,6 +21,7 @@
         /// It is the responsibility of the implementation to provide the destination bucket.
         /// </para>
         /// <para>
+        /// <example>
         /// Example implementation
         /// <code>
         /// private IAmazonS3 s3Client;
@@ -56,6 +57,7 @@
         ///     return ub.Uri;
         /// }
         /// </code>
+        /// </example>
         /// </para>
         /// </summary>
         /// <param name="stackName">Name of the stack. Use to form part of the S3 key.</param>

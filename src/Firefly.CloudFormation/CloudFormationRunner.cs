@@ -16,7 +16,6 @@ namespace Firefly.CloudFormation
     using Firefly.CloudFormation.Model;
     using Firefly.CloudFormation.Parsers;
     using Firefly.CloudFormation.Resolvers;
-    using Firefly.CloudFormation.Utils;
 
     /// <summary>
     /// <para>
@@ -170,8 +169,8 @@ namespace Firefly.CloudFormation
         /// </summary>
         private string templateDescription;
 
-        /// <summary>Whether to wait if an operation is in progress</summary>
-        private bool waitForInProgressUpdate;
+        /// <summary>Whether to follow an in-progress operation.</summary>
+        private bool followOperation;
 
         #endregion
 
@@ -185,7 +184,7 @@ namespace Firefly.CloudFormation
         /// <param name="capabilities">The capabilities.</param>
         /// <param name="context">The Cake context.</param>
         /// <param name="tags">Stack level tags.</param>
-        /// <param name="waitForInProgressUpdate">if set to <c>true</c> [wait for in progress update].</param>
+        /// <param name="followOperation">if set to <c>true</c> [wait for in progress update].</param>
         /// <param name="deleteNoopChangeSet">if set to <c>true</c> [delete no-op change set].</param>
         /// <param name="changesetOnly">if set to <c>true</c> only create change set without updating.</param>
         /// <param name="resourcesToImportLocation">Resources to import</param>
@@ -211,7 +210,7 @@ namespace Firefly.CloudFormation
             IEnumerable<Capability> capabilities,
             ICloudFormationContext context,
             List<Tag> tags,
-            bool waitForInProgressUpdate,
+            bool followOperation,
             bool deleteNoopChangeSet,
             bool changesetOnly,
             string resourcesToImportLocation,
@@ -249,7 +248,7 @@ namespace Firefly.CloudFormation
             this.changesetOnly = changesetOnly;
             this.templateLocation = templateLocation;
             this.stackName = stackName ?? throw new ArgumentNullException(nameof(stackName));
-            this.waitForInProgressUpdate = waitForInProgressUpdate;
+            this.followOperation = followOperation;
             this.deleteNoopChangeSet = deleteNoopChangeSet;
 
             // Cheeky unit test detection
@@ -360,7 +359,7 @@ namespace Firefly.CloudFormation
 
             var stackId = (await this.client.CreateStackAsync(req)).StackId;
 
-            if (this.waitForInProgressUpdate)
+            if (this.followOperation)
             {
                 await this.WaitStackOperationAsync(stackId, true);
                 return new CloudFormationResult
@@ -442,7 +441,7 @@ namespace Firefly.CloudFormation
                         RetainResources = this.retainResource
                     });
 
-            if (this.waitForInProgressUpdate)
+            if (this.followOperation)
             {
                 await this.WaitStackOperationAsync(stack.StackId, true);
                 return new CloudFormationResult
@@ -471,15 +470,15 @@ namespace Firefly.CloudFormation
         // ReSharper disable once UnusedMember.Global - Public API
         public async Task<CloudFormationResult> ResetStackAsync()
         {
-            var previousWaitSetting = this.waitForInProgressUpdate;
+            var previousWaitSetting = this.followOperation;
 
             // Must wait for delete, irrespective of wait setting
-            this.waitForInProgressUpdate = true;
+            this.followOperation = true;
 
             try
             {
                 await this.DeleteStackAsync();
-                this.waitForInProgressUpdate = previousWaitSetting;
+                this.followOperation = previousWaitSetting;
                 var result = await this.CreateStackAsync();
 
                 if (result.StackOperationResult == StackOperationResult.StackCreated)
@@ -491,7 +490,7 @@ namespace Firefly.CloudFormation
             }
             finally
             {
-                this.waitForInProgressUpdate = previousWaitSetting;
+                this.followOperation = previousWaitSetting;
             }
         }
 
@@ -525,7 +524,7 @@ namespace Firefly.CloudFormation
 
                 case StackOperationalState.Busy:
 
-                    if (this.waitForInProgressUpdate)
+                    if (this.followOperation)
                     {
                         // Track stack until update completes
                         // Wait for previous update to complete
@@ -673,7 +672,7 @@ namespace Firefly.CloudFormation
                 await this.client.UpdateStackAsync(await this.GetUpdateRequestWithPolicyFromChangesetRequestAsync(changeSetRequest));
             }
 
-            if (this.waitForInProgressUpdate)
+            if (this.followOperation)
             {
                 await this.WaitStackOperationAsync(stack.StackId, true);
                 return new CloudFormationResult

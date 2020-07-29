@@ -10,7 +10,8 @@
     using Amazon.CloudFormation.Model;
 
     /// <summary>
-    /// Extension methods for <see cref="ILogger"/>
+    /// Provides implementations of some of the methods of <see cref="ILogger"/>
+    /// and declares some properties and methods useful for rendering log messages.
     /// </summary>
     public abstract class BaseLogger : ILogger
     {

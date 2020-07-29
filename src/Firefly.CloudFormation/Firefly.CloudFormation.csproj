@@ -12,4 +12,8 @@
     <PackageReference Include="YamlDotNet" Version="7.0.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="S3\" />
+  </ItemGroup>
+
 </Project>

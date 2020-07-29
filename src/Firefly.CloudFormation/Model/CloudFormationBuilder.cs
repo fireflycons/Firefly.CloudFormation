@@ -14,9 +14,21 @@ namespace Firefly.CloudFormation.Model
 
     /// <summary>
     /// <para>
-    /// Builder pattern implementation for <see cref="CloudFormationRunner"/>
+    /// Fluent builder pattern implementation for <see cref="CloudFormationRunner"/>
     /// </para>
     /// <para>
+    /// <example>
+    /// <code>
+    /// var builder = CloudFormationRunner.Builder(new MyCloudFormationContext(), "my-stack");
+    /// var runner = builder
+    ///     .WithTemplateLocation("~/repos/my-aws-project/cloudformation.yaml")
+    ///     .WithCapabilities(new [] { Capability.CAPABILITY_IAM })
+    ///     .WithFollowOperation()
+    ///     .Build();
+    ///
+    /// await runner.CreateStackAsync();
+    /// </code>
+    /// </example>
     /// A builder is constructed by calling the static method <see cref="CloudFormationRunner.Builder"/>
     /// </para>
     /// </summary>
@@ -73,8 +85,8 @@ namespace Firefly.CloudFormation.Model
         /// <summary>The template location. Either path o URL</summary>
         private string _templateLocation;
 
-        /// <summary>Whether to wait if an operation is in progress</summary>
-        private bool _waitForInProgressUpdate;
+        /// <summary>Whether to wait for an operation to complete</summary>
+        private bool _followOperation;
 
         /// <summary>
         /// <c>true</c> to use previous template for updates.
@@ -154,7 +166,7 @@ namespace Firefly.CloudFormation.Model
                 this._capabilities,
                 this._cloudFormationContext,
                 this._tags,
-                this._waitForInProgressUpdate,
+                this._followOperation,
                 this._deleteNoopChangeset,
                 this._changesetOnly,
                 this._resourceImportsLocation,
@@ -298,12 +310,21 @@ namespace Firefly.CloudFormation.Model
             return this;
         }
 
-        /// <summary>Sets whether to wait for in progress update.</summary>
+        /// <summary>
+        /// <para>
+        /// Sets whether to follow a stack operation.
+        /// </para>
+        /// <para>
+        /// For all stack modifications, if this is set then the method will not return until the stack operation completes.
+        /// Additionally for stack updates, should a modification be in progress at the time <see cref="CloudFormationRunner.UpdateStackAsync"/> is called,
+        /// then that method will wait for the modification to complete, sending events to the <see cref="ILogger"/> interface prior to creating the update changeset.
+        /// </para>
+        /// </summary>
         /// <param name="enable">If <c>true</c> (default), wait for stack action to complete, logging stack events to the given <see cref="ILogger"/> implementation.</param>
         /// <returns>The builder</returns>
-        public CloudFormationBuilder WithWaitForInProgressUpdate(bool enable = true)
+        public CloudFormationBuilder WithFollowOperation(bool enable = true)
         {
-            this._waitForInProgressUpdate = enable;
+            this._followOperation = enable;
             return this;
         }
 

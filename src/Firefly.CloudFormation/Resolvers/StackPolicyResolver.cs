@@ -1,7 +1,5 @@
 ﻿namespace Firefly.CloudFormation.Resolvers
 {
-    using Firefly.CloudFormation.Utils;
-
     /// <summary>
     /// Concrete file resolver implementation for stack policy files.
     /// </summary>
