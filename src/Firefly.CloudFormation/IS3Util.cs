@@ -6,9 +6,10 @@
     using Firefly.CloudFormation.Model;
 
     /// <summary>
-    /// Interface describing a method that CloudFormation operations can use to upload oversize content
-    /// (template or policy document) to S3. If an implementation of this interface is not provided to the <see cref="CloudFormationBuilder"/>,
-    /// then an attempt to run with oversize content (e.g. template body > 51,200 bytes), then the operation will fail.
+    /// Interface describing methods that CloudFormation operations can use to upload oversize content
+    /// (template or policy document) to S3 and to download template content from S3.
+    /// If an implementation of this interface is not provided to the <see cref="CloudFormationBuilder"/>,
+    /// then an attempt to run with oversize content (e.g. template body > 51,200 bytes) or to refer to a template in S3, then the operation will fail.
     /// </summary>
     public interface IS3Util
     {
@@ -55,6 +56,17 @@
         ///             });
         ///
         ///     return ub.Uri;
+        /// }
+        ///
+        /// public async Task&lt;string&gt; GetS3ObjectContent(string bucketName, string key)
+        /// {
+        ///     using (var response = await this.s3.GetObjectAsync(new GetObjectRequest { BucketName = bucketName, Key = key }))
+        ///     {
+        ///         using (var sr = new StreamReader(response.ResponseStream))
+        ///         {
+        ///             return sr.ReadToEnd();
+        ///         }
+        ///     } 
         /// }
         /// </code>
         /// </example>
