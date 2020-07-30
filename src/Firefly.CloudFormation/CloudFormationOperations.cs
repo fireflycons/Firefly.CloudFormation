@@ -13,7 +13,7 @@
     /// <summary>
     /// Contains methods for operations on stacks that are not related to applying templates
     /// </summary>
-    internal class CloudFormationOperations
+    public class CloudFormationOperations
     {
         /// <summary>
         /// The client factory
