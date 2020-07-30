@@ -168,7 +168,7 @@ Task("PushNuget")
     .Does(() => {
 
         NuGetPush(nugetPackagePath, new NuGetPushSettings {
-                Source = EnvironmentVariableOrDefault("NUGET_ENDPOINT", "https://api.nuget.org/v3/index.json"),
+                Source = EnvironmentVariable<string>("NUGET_ENDPOINT", "https://api.nuget.org/v3/index.json"),
                 ApiKey = EnvironmentVariable("NUGET_API_KEY")
             });
     });
@@ -357,20 +357,35 @@ string EnvironmentVariableStrict(string name)
     return val;
 }
 
-string EnvironmentVariableOrDefault(string name, string defaultValue)
-{
-    var val = EnvironmentVariable(name);
-
-    return string.IsNullOrEmpty(val) ? defaultValue : val;
-}
-
 Version GetBuildVersion()
 {
     var tag = EnvironmentVariable("APPVEYOR_REPO_TAG_NAME");
 
     if (tag == null)
     {
-        return new Version(EnvironmentVariable<string>("APPVEYOR_BUILD_VERSION", "0.0.1"));
+        var appveyorVersion = EnvironmentVariable("APPVEYOR_BUILD_VERSION");
+
+        if (appveyorVersion != null)
+        {
+            return new Version(appveyorVersion);
+        }
+
+        var localBuildVer = File("build.ver");
+
+        Version newVer;
+
+        if (FileExists(localBuildVer))
+        {
+            var ver = new Version(System.IO.File.ReadAllText(localBuildVer));
+            newVer = new Version(ver.Major, ver.Minor, ver.Build + 1);
+        }
+        else
+        {
+            newVer = new Version("0.0.1");
+        }
+
+        System.IO.File.WriteAllText(localBuildVer, newVer.ToString());
+        return newVer;
     }
 
     var m = Regex.Match(tag, @"^v(?<version>\d+\.\d+\.\d+)$", RegexOptions.IgnoreCase);
