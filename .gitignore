@@ -342,3 +342,4 @@ healthchecksdb
 build/tools/*
 !buiid/tools/packages.config
 test-output/
+build/build.ver
