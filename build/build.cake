@@ -373,7 +373,7 @@ Version GetBuildVersion()
         if (appveyorVersion != null)
         {
             // Development version.
-            return new Version($"0.0.{APPVEYOR_BUILD_NUMBER}");
+            return new Version($"0.0.{appveyorVersion}");
         }
 
         // Generate a version for private package manager.
