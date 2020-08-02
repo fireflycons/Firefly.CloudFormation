@@ -13,55 +13,61 @@
     /// If an implementation of this interface is not provided to the <see cref="CloudFormationBuilder"/>,
     /// then an attempt to run with oversize content (e.g. template body > 51,200 bytes) or to refer to a template in S3, then the operation will fail.
     /// </para>
+    /// <para>
+    /// Example implementation.
+    /// </para>
+    /// </summary>
     /// <example>
-    /// Example implementation
     /// <code>
-    /// private IAmazonS3 s3Client;
-    /// private string BucketName;
-    /// private ILogger logger;
-    ///
-    /// public async Task&lt;Uri&gt; UploadOversizeArtifactToS3(
-    ///     string stackName,
-    ///     string body,
-    ///     string originalFilename,
-    ///     UploadFileType uploadFileType)
+    /// class S3Util: IS3Util
     /// {
-    ///     var ms = new MemoryStream(
-    ///         new UTF8Encoding().GetBytes(body ?? throw new ArgumentNullException(nameof(body))));
+    ///     // Constructor implementation omitted.
+    ///     private IAmazonS3 s3Client;
+    ///     private string BucketName;
+    ///     private ILogger logger;
     ///
-    ///     var key = uploadFileType == UploadFileType.Template
-    ///                   ? $"_{stackName}_template_{originalFilename}"
-    ///                   : $"_{stackName}_policy_{originalFilename}";
-    ///
-    ///     var ub = new UriBuilder($"https://{this.BucketName}.s3.amazonaws.com") { Path = $"/{key}" };
-    ///
-    ///     this.logger.LogInformation($"Copying oversize {uploadFileType.ToString().ToLower()} to {ub.Uri}");
-    ///
-    ///     await this.s3Client.PutObjectAsync(
-    ///         new PutObjectRequest
-    ///             {
-    ///                 BucketName = this.BucketName,
-    ///                 Key = key,
-    ///                 AutoCloseStream = true,
-    ///                 InputStream = ms
-    ///             });
-    ///
-    ///     return ub.Uri;
-    /// }
-    ///
-    /// public async Task&lt;string&gt; GetS3ObjectContent(string bucketName, string key)
-    /// {
-    ///     using (var response = await this.s3.GetObjectAsync(new GetObjectRequest { BucketName = bucketName, Key = key }))
+    ///     public async Task&lt;Uri&gt; UploadOversizeArtifactToS3(
+    ///         string stackName,
+    ///         string body,
+    ///         string originalFilename,
+    ///         UploadFileType uploadFileType)
     ///     {
-    ///         using (var sr = new StreamReader(response.ResponseStream))
+    ///         var ms = new MemoryStream(
+    ///             new UTF8Encoding().GetBytes(body ?? throw new ArgumentNullException(nameof(body))));
+    ///
+    ///         var key = uploadFileType == UploadFileType.Template
+    ///                       ? $"_{stackName}_template_{originalFilename}"
+    ///                       : $"_{stackName}_policy_{originalFilename}";
+    ///
+    ///         var ub = new UriBuilder($"https://{this.BucketName}.s3.amazonaws.com") { Path = $"/{key}" };
+    ///
+    ///         this.logger.LogInformation($"Copying oversize {uploadFileType.ToString().ToLower()} to {ub.Uri}");
+    ///
+    ///         await this.s3Client.PutObjectAsync(
+    ///             new PutObjectRequest
+    ///                 {
+    ///                     BucketName = this.BucketName,
+    ///                     Key = key,
+    ///                     AutoCloseStream = true,
+    ///                     InputStream = ms
+    ///                 });
+    ///
+    ///         return ub.Uri;
+    ///     }
+    ///
+    ///     public async Task&lt;string&gt; GetS3ObjectContent(string bucketName, string key)
+    ///     {
+    ///         using (var response = await this.s3.GetObjectAsync(new GetObjectRequest { BucketName = bucketName, Key = key }))
     ///         {
-    ///             return sr.ReadToEnd();
-    ///         }
-    ///     } 
+    ///             using (var sr = new StreamReader(response.ResponseStream))
+    ///             {
+    ///                 return sr.ReadToEnd();
+    ///             }
+    ///         } 
+    ///     }
     /// }
     /// </code>
     /// </example>
-    /// </summary>
     public interface IS3Util
     {
         /// <summary>
