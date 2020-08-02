@@ -143,7 +143,7 @@ Task("CopyDocumentationTo-github.io-clone")
     .WithCriteria(isReleasePublication || !string.IsNullOrEmpty(EnvironmentVariable("FORCE_DOC_PUSH")))
     .Does(() => {
 
-        var outputDir = MakeAbsolute(Directory(System.IO.Path.Combine(EnvironmentVariableStrict("APPVEYOR_BUILD_FOLDER"), "..", "fireflycons.github.io", "Firefly.CloudFomation")));
+        var outputDir = MakeAbsolute(Directory(System.IO.Path.Combine(EnvironmentVariableStrict("APPVEYOR_BUILD_FOLDER"), "..", "fireflycons.github.io", "Firefly-CloudFormation")));
 
         Information($"Updating documentation in {outputDir}");
 
