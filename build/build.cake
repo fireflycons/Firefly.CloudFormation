@@ -368,13 +368,15 @@ Version GetBuildVersion()
 
     if (tag == null)
     {
-        var appveyorVersion = EnvironmentVariable("APPVEYOR_BUILD_VERSION");
+        var appveyorVersion = EnvironmentVariable("APPVEYOR_BUILD_NUMBER");
 
         if (appveyorVersion != null)
         {
-            return new Version(appveyorVersion);
+            // Development version.
+            return new Version($"0.0.{APPVEYOR_BUILD_NUMBER}");
         }
 
+        // Generate a version for private package manager.
         var localBuildVer = File("build.ver");
 
         Version newVer;
@@ -393,6 +395,7 @@ Version GetBuildVersion()
         return newVer;
     }
 
+    // Tagged, i.e. release build.
     var m = Regex.Match(tag, @"^v(?<version>\d+\.\d+\.\d+)$", RegexOptions.IgnoreCase);
 
     if (m.Success)
