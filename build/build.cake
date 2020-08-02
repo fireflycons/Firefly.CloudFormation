@@ -75,6 +75,10 @@ Task("SetAssemblyProperties")
 
         var propertyGroups = project.Elements("PropertyGroup").ToList();
 
+        Information($"Package version: {buildVersion}");
+        Information($"Assembly version: {buildVersion.ToString(2)}.0.0");
+        Information($"File version: {buildVersion.ToString(3)}.0");
+
         SetProjectProperty(propertyGroups, "Version", buildVersion.ToString());
         SetProjectProperty(propertyGroups, "AssemblyVersion", $"{buildVersion.ToString(2)}.0.0");
         SetProjectProperty(propertyGroups, "FileVersion", $"{buildVersion.ToString(3)}.0");
