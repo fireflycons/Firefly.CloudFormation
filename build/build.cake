@@ -140,7 +140,7 @@ Task("CompileDocumentation")
 
 Task("CopyDocumentationTo-github.io-clone")
     .WithCriteria(IsRunningOnWindows())
-    .WithCriteria(isReleasePublication)
+    .WithCriteria(isReleasePublication || !string.IsNullOrEmpty(EnvironmentVariable("FORCE_DOC_PUSH")))
     .Does(() => {
 
         var outputDir = MakeAbsolute(Directory(System.IO.Path.Combine(EnvironmentVariableStrict("APPVEYOR_BUILD_FOLDER"), "..", "fireflycons.github.io", "Firefly.CloudFomation")));
@@ -167,7 +167,7 @@ Task("PushAppveyor")
     });
 
 Task("PushNuget")
-    .WithCriteria((isAppveyor && isReleasePublication) || !string.IsNullOrEmpty(EnvironmentVariable("NUGET_ENDPOINT")))
+    .WithCriteria(isReleasePublication || !string.IsNullOrEmpty(EnvironmentVariable("NUGET_ENDPOINT")))
     .WithCriteria(IsRunningOnWindows())
     .Does(() => {
 
