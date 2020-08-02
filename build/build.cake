@@ -96,7 +96,6 @@ Task("BuildProject")
     });
 
 Task("TestProject")
-    .WithCriteria(IsRunningOnWindows())
     .Does(() => {
 
         try
