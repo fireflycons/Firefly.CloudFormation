@@ -48,16 +48,15 @@
                 throw;
             }
         }
-
+/*
         /// <summary>  Tests if given stack exists.</summary>
         /// <param name="stackName">Name of the stack.</param>
         /// <returns>true if the stack exists; else false</returns>
-        public async Task<bool> StackExistsAsync(string stackName)
+        public async Task<Stack> StackExistsAsync(string stackName)
         {
             try
             {
-                await this.DescribeStackAsync(stackName);
-                return true;
+                return (await this.DescribeStackAsync(stackName)).Stacks.First();
             }
             catch (AmazonCloudFormationException ex)
             {
@@ -67,10 +66,10 @@
                     this.context.Logger.LogWarning($"Error checking for stack: {ex.Message}");
                 }
 
-                return false;
+                return null;
             }
         }
-
+*/
         /// <summary>
         /// Tests if the given stack is ready, i.e. is not currently being updated
         /// </summary>
@@ -133,7 +132,7 @@
             {
                 if (ex.Message.Contains($"Stack with id {stackName} does not exist"))
                 {
-                    throw new StackOperationException(ex.Message);
+                    throw new StackOperationException(null, StackOperationalState.NotFound);
                 }
 
                 throw;

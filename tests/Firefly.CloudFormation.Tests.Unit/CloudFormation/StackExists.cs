@@ -9,6 +9,7 @@ namespace Firefly.CloudFormation.Tests.Unit.CloudFormation
     using Amazon.CloudFormation;
     using Amazon.CloudFormation.Model;
 
+    using Firefly.CloudFormation.Model;
     using Firefly.CloudFormation.Tests.Unit.Utils;
 
     using FluentAssertions;
@@ -71,7 +72,7 @@ namespace Firefly.CloudFormation.Tests.Unit.CloudFormation
             mockClientFactory.Setup(f => f.CreateCloudFormationClient()).Returns(mockCf.Object);
             var operations = new CloudFormationOperations(mockClientFactory.Object, mockContext.Object);
 
-            (await operations.StackExistsAsync(StackName)).Should().BeTrue();
+            (await operations.GetStackAsync(StackName)).Should().NotBeNull();
         }
 
         /// <summary>
@@ -79,7 +80,7 @@ namespace Firefly.CloudFormation.Tests.Unit.CloudFormation
         /// </summary>
         /// <returns>A <see cref="Task"/></returns>
         [Fact]
-        public async Task ShouldNotExistWhenDescribeStacksThrowsTheExpectedExceptionForStackNotFound()
+        public void ShouldNotExistWhenDescribeStacksThrowsTheExpectedExceptionForStackNotFound()
         {
             var logger = new TestLogger(this.output);
             var mockClientFactory = TestHelpers.GetClientFactoryMock();
@@ -92,7 +93,9 @@ namespace Firefly.CloudFormation.Tests.Unit.CloudFormation
             mockClientFactory.Setup(f => f.CreateCloudFormationClient()).Returns(mockCf.Object);
             var operations = new CloudFormationOperations(mockClientFactory.Object, mockContext.Object);
 
-            (await operations.StackExistsAsync(StackName)).Should().BeFalse();
+            Func<Task<Stack>> action = async () => await operations.GetStackAsync(StackName);
+            action.Should().Throw<StackOperationException>().And.OperationalState.Should()
+                .Be(StackOperationalState.NotFound);
         }
 
         /// <summary>
@@ -112,7 +115,7 @@ namespace Firefly.CloudFormation.Tests.Unit.CloudFormation
             mockClientFactory.Setup(f => f.CreateCloudFormationClient()).Returns(mockCf.Object);
             var operations = new CloudFormationOperations(mockClientFactory.Object, mockContext.Object);
 
-            Func<Task<bool>> action = async () => await operations.StackExistsAsync(StackName);
+            Func<Task<Stack>> action = async () => await operations.GetStackAsync(StackName);
 
             action.Should().Throw<InvalidOperationException>();
         }

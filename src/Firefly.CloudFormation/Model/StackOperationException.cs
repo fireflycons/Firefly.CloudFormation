@@ -1,6 +1,7 @@
 ﻿namespace Firefly.CloudFormation.Model
 {
     using System;
+    using System.Collections.Generic;
     using System.Runtime.Serialization;
 
     using Amazon.CloudFormation.Model;
@@ -12,6 +13,24 @@
     [Serializable]
     public class StackOperationException : Exception
     {
+        /// <summary>
+        /// The operational state messages
+        /// </summary>
+        private static readonly Dictionary<StackOperationalState, string> OperationalStateMessages =
+            new Dictionary<StackOperationalState, string>
+                {
+                    { StackOperationalState.Busy, "Stack is being modified by another process." },
+                    { StackOperationalState.Broken, "Stack is broken. Please check in AWS Console and fix." },
+                    {
+                        StackOperationalState.DeleteFailed,
+                        "Stack is in DELETE_FAILED state. Try deleting with Retain Resource."
+                    },
+                    { StackOperationalState.Deleting, "Stack is being deleted by another process." },
+                    { StackOperationalState.NotFound, "Stack does not exist." },
+                    { StackOperationalState.Ready, "Stack is ready." },
+                    { StackOperationalState.Exists, "A stack with this name already exists." }
+                };
+
         /// <summary>
         /// Initializes a new instance of the <see cref="StackOperationException"/> class.
         /// </summary>
@@ -26,11 +45,12 @@
         /// Initializes a new instance of the <see cref="StackOperationException"/> class.
         /// </summary>
         /// <param name="stack">The stack.</param>
-        /// <param name="message">The message.</param>
-        public StackOperationException(Stack stack, string message)
-        : base(message)
+        /// <param name="state">The operational state.</param>
+        public StackOperationException(Stack stack, StackOperationalState state)
+            : base(OperationalStateMessages[state])
         {
             this.Stack = stack;
+            this.OperationalState = state;
         }
 
         /// <summary>
@@ -69,5 +89,13 @@
         /// The stack.
         /// </value>
         public Stack Stack { get; }
+
+        /// <summary>
+        /// Gets the operational state of the stack.
+        /// </summary>
+        /// <value>
+        /// The state of the operational.
+        /// </value>
+        public StackOperationalState OperationalState { get; }
     }
 }

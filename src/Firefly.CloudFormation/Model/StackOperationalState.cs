@@ -6,9 +6,19 @@
     public enum StackOperationalState
     {
         /// <summary>
+        /// State is unknown - used only in <see cref="StackOperationException"/>
+        /// </summary>
+        Unknown = 0,
+
+        /// <summary>
         /// The stack doesn't exist, i.e. can be created.
         /// </summary>
         NotFound,
+
+        /// <summary>
+        /// The stack exists, i.e. cannot be created.
+        /// </summary>
+        Exists,
 
         /// <summary>
         /// Stack is ready, i.e. can be updated or deleted.
@@ -33,6 +43,6 @@
         /// <summary>
         /// Stack is broken - e.g. a rollback failed
         /// </summary>
-        Broken
+        Broken,
     }
 }

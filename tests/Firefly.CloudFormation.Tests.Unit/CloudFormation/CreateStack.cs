@@ -130,7 +130,7 @@
 
             Func<Task<CloudFormationResult>> action = async () => await runner.CreateStackAsync();
 
-            action.Should().Throw<StackOperationException>().WithMessage($"Stack {StackName} already exists");
+            action.Should().Throw<StackOperationException>().And.OperationalState.Should().Be(StackOperationalState.Exists);
         }
     }
 }

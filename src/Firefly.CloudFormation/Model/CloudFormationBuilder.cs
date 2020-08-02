@@ -139,6 +139,11 @@ namespace Firefly.CloudFormation.Model
         private List<string> _resourcesToRetain;
 
         /// <summary>
+        /// The wait for in progress update
+        /// </summary>
+        private bool _waitForInProgressUpdate;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="CloudFormationBuilder"/> class.
         /// </summary>
         /// <param name="context">The context.</param>
@@ -167,6 +172,7 @@ namespace Firefly.CloudFormation.Model
                 this._cloudFormationContext,
                 this._tags,
                 this._followOperation,
+                this._waitForInProgressUpdate,
                 this._deleteNoopChangeset,
                 this._changesetOnly,
                 this._resourceImportsLocation,
@@ -325,6 +331,26 @@ namespace Firefly.CloudFormation.Model
         public CloudFormationBuilder WithFollowOperation(bool enable = true)
         {
             this._followOperation = enable;
+            return this;
+        }
+
+        /// <summary>
+        /// <para>
+        /// Sets whether to wait for another operation on this stack which is in progress.
+        /// </para>
+        /// <para>
+        /// For stack updates, should a modification be in progress at the time <see cref="CloudFormationRunner.UpdateStackAsync"/> is called,
+        /// then that method will wait for the modification to complete, sending events to the <see cref="ILogger"/> interface prior to creating the update changeset.
+        /// </para>
+        /// </summary>
+        /// <param name="enable">
+        /// If <c>true</c> (default), wait for stack action initiated elsewhere to complete,
+        /// logging stack events to the given <see cref="ILogger"/> implementation.
+        /// </param>
+        /// <returns>The builder</returns>
+        public CloudFormationBuilder WithWaitForInProgressUpdate(bool enable = true)
+        {
+            this._waitForInProgressUpdate = enable;
             return this;
         }
 

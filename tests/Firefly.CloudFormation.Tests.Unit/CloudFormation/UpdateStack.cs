@@ -113,22 +113,22 @@ namespace Firefly.CloudFormation.Tests.Unit.CloudFormation
 
             Func<Task<CloudFormationResult>> action = async () => await runner.UpdateStackAsync(null);
 
-            action.Should().Throw<StackOperationException>().WithMessage($"Stack with id {StackName} does not exist");
+            action.Should().Throw<StackOperationException>().WithMessage("Stack does not exist.");
         }
 
         /// <summary>
         /// Update should fail if stack is broken.
         /// </summary>
         /// <param name="stackStatus">The stack status.</param>
+        /// <param name="expectedOutcome">Expected outcome</param>
         [Theory]
-        [InlineData("CREATE_FAILED")]
-        [InlineData("DELETE_FAILED")]
-        [InlineData("IMPORT_ROLLBACK_FAILED")]
-        [InlineData("ROLLBACK_FAILED")]
-        [InlineData("UPDATE_ROLLBACK_FAILED")]
-        public void ShouldFailIfStackIsBroken(string stackStatus)
+        [InlineData("CREATE_FAILED", StackOperationalState.Broken)]
+        [InlineData("DELETE_FAILED", StackOperationalState.DeleteFailed)]
+        [InlineData("IMPORT_ROLLBACK_FAILED", StackOperationalState.Broken)]
+        [InlineData("ROLLBACK_FAILED", StackOperationalState.Broken)]
+        [InlineData("UPDATE_ROLLBACK_FAILED", StackOperationalState.Broken)]
+        public void ShouldFailIfStackIsBroken(string stackStatus, StackOperationalState expectedOutcome)
         {
-            var expectedMessage = $"Cannot update stack: Current state: * ({stackStatus})";
             var logger = new TestLogger(this.output);
             var mockClientFactory = TestHelpers.GetClientFactoryMock();
             var mockContext = TestHelpers.GetContextMock(logger);
@@ -166,7 +166,7 @@ namespace Firefly.CloudFormation.Tests.Unit.CloudFormation
 
             Func<Task<CloudFormationResult>> action = async () => await runner.UpdateStackAsync(null);
 
-            action.Should().Throw<StackOperationException>().WithMessage(expectedMessage);
+            action.Should().Throw<StackOperationException>().And.OperationalState.Should().Be(expectedOutcome);
         }
 
         /// <summary>
@@ -185,7 +185,7 @@ namespace Firefly.CloudFormation.Tests.Unit.CloudFormation
         [InlineData("UPDATE_ROLLBACK_IN_PROGRESS")]
         public void ShouldFailIfStackBusyAndWaitIsFalse(string stackStatus)
         {
-            var expectedMessage = $"Stack is being updated by another process.";
+            var expectedMessage = "Stack is being modified by another process.";
             var logger = new TestLogger(this.output);
             var mockClientFactory = TestHelpers.GetClientFactoryMock();
             var mockContext = TestHelpers.GetContextMock(logger);

@@ -186,31 +186,31 @@
 
             Func<Task<CloudFormationResult>> action = async () => await runner.DeleteStackAsync();
 
-            action.Should().Throw<StackOperationException>().WithMessage($"Stack with id {StackName} does not exist");
+            action.Should().Throw<StackOperationException>().And.OperationalState.Should().Be(StackOperationalState.NotFound);
         }
 
         /// <summary>
         /// Stack delete should fail if stack is not in correct state
         /// </summary>
         /// <param name="stackStatus">The stack status.</param>
+        /// <param name="expectedOutcome">Expected outcome</param>
         [Theory]
-        [InlineData("CREATE_FAILED")]
-        [InlineData("IMPORT_ROLLBACK_FAILED")]
-        [InlineData("ROLLBACK_FAILED")]
-        [InlineData("UPDATE_ROLLBACK_FAILED")]
-        [InlineData("CREATE_IN_PROGRESS")]
-        [InlineData("IMPORT_IN_PROGRESS")]
-        [InlineData("IMPORT_ROLLBACK_IN_PROGRESS")]
-        [InlineData("REVIEW_IN_PROGRESS")]
-        [InlineData("ROLLBACK_IN_PROGRESS")]
-        [InlineData("UPDATE_COMPLETE_CLEANUP_IN_PROGRESS")]
-        [InlineData("UPDATE_IN_PROGRESS")]
-        [InlineData("UPDATE_ROLLBACK_COMPLETE_CLEANUP_IN_PROGRESS")]
-        [InlineData("UPDATE_ROLLBACK_IN_PROGRESS")]
+        [InlineData("CREATE_FAILED", StackOperationalState.Broken)]
+        [InlineData("IMPORT_ROLLBACK_FAILED", StackOperationalState.Broken)]
+        [InlineData("ROLLBACK_FAILED", StackOperationalState.Broken)]
+        [InlineData("UPDATE_ROLLBACK_FAILED", StackOperationalState.Broken)]
+        [InlineData("CREATE_IN_PROGRESS", StackOperationalState.Busy)]
+        [InlineData("IMPORT_IN_PROGRESS", StackOperationalState.Busy)]
+        [InlineData("IMPORT_ROLLBACK_IN_PROGRESS", StackOperationalState.Busy)]
+        [InlineData("REVIEW_IN_PROGRESS", StackOperationalState.Busy)]
+        [InlineData("ROLLBACK_IN_PROGRESS", StackOperationalState.Busy)]
+        [InlineData("UPDATE_COMPLETE_CLEANUP_IN_PROGRESS", StackOperationalState.Busy)]
+        [InlineData("UPDATE_IN_PROGRESS", StackOperationalState.Busy)]
+        [InlineData("UPDATE_ROLLBACK_COMPLETE_CLEANUP_IN_PROGRESS", StackOperationalState.Busy)]
+        [InlineData("UPDATE_ROLLBACK_IN_PROGRESS", StackOperationalState.Busy)]
 
-        public void ShouldFailIfStackIsBrokenOrBusy(string stackStatus)
+        public void ShouldFailIfStackIsBrokenOrBusy(string stackStatus, StackOperationalState expectedOutcome)
         {
-            var expectedMessage = $"Cannot delete stack: Current state: {(stackStatus.EndsWith("FAILED") ? "Broken" : "Busy")} ({stackStatus})";
             var logger = new TestLogger(this.output);
             var mockClientFactory = TestHelpers.GetClientFactoryMock();
             var mockContext = TestHelpers.GetContextMock(logger);
@@ -247,7 +247,7 @@
 
             Func<Task<CloudFormationResult>> action = async () => await runner.DeleteStackAsync();
 
-            action.Should().Throw<StackOperationException>().WithMessage(expectedMessage);
+            action.Should().Throw<StackOperationException>().And.OperationalState.Should().Be(expectedOutcome);
         }
     }
 }

@@ -152,6 +152,11 @@ namespace Firefly.CloudFormation
         private readonly int waitPollTime = 5000;
 
         /// <summary>
+        /// Whether to follow an operation initiated by another process.
+        /// </summary>
+        private readonly bool waitForInProgressUpdate;
+
+        /// <summary>
         /// The retain resource
         /// </summary>
         private List<string> retainResource;
@@ -184,7 +189,8 @@ namespace Firefly.CloudFormation
         /// <param name="capabilities">The capabilities.</param>
         /// <param name="context">The Cake context.</param>
         /// <param name="tags">Stack level tags.</param>
-        /// <param name="followOperation">if set to <c>true</c> [wait for in progress update].</param>
+        /// <param name="followOperation">if set to <c>true</c> [follow operation].</param>
+        /// <param name="waitForInProgressUpdate">if set to <c>true</c> [wait for in progress update].</param>
         /// <param name="deleteNoopChangeSet">if set to <c>true</c> [delete no-op change set].</param>
         /// <param name="changesetOnly">if set to <c>true</c> only create change set without updating.</param>
         /// <param name="resourcesToImportLocation">Resources to import</param>
@@ -211,6 +217,7 @@ namespace Firefly.CloudFormation
             ICloudFormationContext context,
             List<Tag> tags,
             bool followOperation,
+            bool waitForInProgressUpdate,
             bool deleteNoopChangeSet,
             bool changesetOnly,
             string resourcesToImportLocation,
@@ -249,6 +256,7 @@ namespace Firefly.CloudFormation
             this.templateLocation = templateLocation;
             this.stackName = stackName ?? throw new ArgumentNullException(nameof(stackName));
             this.followOperation = followOperation;
+            this.waitForInProgressUpdate = waitForInProgressUpdate;
             this.deleteNoopChangeSet = deleteNoopChangeSet;
 
             // Cheeky unit test detection
@@ -316,9 +324,21 @@ namespace Firefly.CloudFormation
         /// <returns><see cref="Task"/> object so we can await task return.</returns>
         public async Task<CloudFormationResult> CreateStackAsync()
         {
-            if (await this.stackOperations.StackExistsAsync(this.stackName))
+            try
             {
-                throw new StackOperationException($"Stack {this.stackName} already exists");
+                var stack = await this.stackOperations.GetStackAsync(this.stackName);
+
+                if (stack != null)
+                {
+                    throw new StackOperationException(stack, StackOperationalState.Exists);
+                }
+            }
+            catch (StackOperationException e)
+            {
+                if (e.OperationalState != StackOperationalState.NotFound)
+                {
+                    throw;
+                }
             }
 
             var req = new CreateStackRequest
@@ -389,9 +409,7 @@ namespace Firefly.CloudFormation
             // Only permit delete if stack is in Ready state
             if (operationalState != StackOperationalState.Ready && operationalState != StackOperationalState.DeleteFailed)
             {
-                throw new StackOperationException(
-                    stack,
-                    $"Cannot delete stack: Current state: {operationalState} ({stack.StackStatus.Value})");
+                throw new StackOperationException(stack, operationalState);
             }
 
             if (operationalState != StackOperationalState.DeleteFailed && haveRetainResources && invalidRetentionConfirmationFunc != null)
@@ -512,19 +530,14 @@ namespace Firefly.CloudFormation
             switch (operationalState)
             {
                 case StackOperationalState.Deleting:
-
-                    throw new StackOperationException(stack, "Stack is being deleted by another process.");
-
                 case StackOperationalState.Broken:
                 case StackOperationalState.DeleteFailed:
 
-                    throw new StackOperationException(
-                        stack,
-                        $"Cannot update stack: Current state: {operationalState} ({stack.StackStatus.Value})");
+                    throw new StackOperationException(stack, operationalState);
 
                 case StackOperationalState.Busy:
 
-                    if (this.followOperation)
+                    if (this.waitForInProgressUpdate)
                     {
                         // Track stack until update completes
                         // Wait for previous update to complete
@@ -538,17 +551,16 @@ namespace Firefly.CloudFormation
                         stack = await this.WaitStackOperationAsync(stack.StackId, false);
                         this.context.Logger.LogInformation(string.Empty);
 
-                        if (await this.stackOperations.GetStackOperationalStateAsync(stack.StackId)
-                            != StackOperationalState.Ready)
+                        var currentState = await this.stackOperations.GetStackOperationalStateAsync(stack.StackId);
+
+                        if (currentState != StackOperationalState.Ready)
                         {
-                            throw new StackOperationException(
-                                stack,
-                                $"Cannot update stack: Other process left stack in {stack.StackStatus.Value} state.");
+                            throw new StackOperationException(stack, currentState);
                         }
                     }
                     else
                     {
-                        throw new StackOperationException(stack, "Stack is being updated by another process.");
+                        throw new StackOperationException(stack, StackOperationalState.Busy);
                     }
 
                     break;
@@ -652,9 +664,11 @@ namespace Firefly.CloudFormation
             }
 
             // Check nobody else has jumped in before us
-            if (await this.stackOperations.GetStackOperationalStateAsync(stack.StackId) != StackOperationalState.Ready)
+            var currentState2 = await this.stackOperations.GetStackOperationalStateAsync(stack.StackId);
+
+            if (currentState2 != StackOperationalState.Ready)
             {
-                throw new StackOperationException(stack, "Stack is being modified by another process.");
+                throw new StackOperationException(stack, currentState2);
             }
 
             // Time from which to start polling events
