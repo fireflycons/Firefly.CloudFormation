@@ -4,7 +4,7 @@
 
 if ($isAppVeyor)
 {
-    # Filter out netcore 5 preview and select latest netcoe 3.1
+    # Filter out netcore 5 preview and select latest netcore 3.1
     $net31latest = dotnet --info |
     Foreach-Object {
         if ($_ -match '^\s+(3\.1\.\d+)')

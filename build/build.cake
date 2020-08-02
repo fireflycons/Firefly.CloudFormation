@@ -139,7 +139,7 @@ Task("CopyDocumentationTo-github.io-clone")
     .WithCriteria(isReleasePublication)
     .Does(() => {
 
-        var outputDir = MakeAbsolute(Directory(System.IO.Path.Combine(EnvironmentVariableStrict("APPVEYOR_BUILD_FOLDER"), "..", "fireflycons.github.io", "PSDynamicParameters")));
+        var outputDir = MakeAbsolute(Directory(System.IO.Path.Combine(EnvironmentVariableStrict("APPVEYOR_BUILD_FOLDER"), "..", "fireflycons.github.io", "Firefly.CloudFomation")));
 
         Information($"Updating documentation in {outputDir}");
 
@@ -163,10 +163,11 @@ Task("PushAppveyor")
     });
 
 Task("PushNuget")
-    .WithCriteria((isAppveyor && isReleasePublication) || !string.IsNullOrEmpty("NUGET_ENDPOINT"))
+    .WithCriteria((isAppveyor && isReleasePublication) || !string.IsNullOrEmpty(EnvironmentVariable("NUGET_ENDPOINT")))
     .WithCriteria(IsRunningOnWindows())
     .Does(() => {
 
+        // Set env var NUGET_ENDPOINT to publish to a feed other than nuget.org
         NuGetPush(nugetPackagePath, new NuGetPushSettings {
                 Source = EnvironmentVariable<string>("NUGET_ENDPOINT", "https://api.nuget.org/v3/index.json"),
                 ApiKey = EnvironmentVariable("NUGET_API_KEY")
@@ -195,7 +196,7 @@ Task("BuildDocumentation")
 Task("Default")
     .IsDependentOn("Build")
     .IsDependentOn("Test")
-    //.IsDependentOn("BuildDocumentation")
+    .IsDependentOn("BuildDocumentation")
     .IsDependentOn("PushPackage");
 
 RunTarget(target);
