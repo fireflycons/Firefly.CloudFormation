@@ -321,12 +321,11 @@ namespace Firefly.CloudFormation.Model
         /// Sets whether to follow a stack operation.
         /// </para>
         /// <para>
-        /// For all stack modifications, if this is set then the method will not return until the stack operation completes.
-        /// Additionally for stack updates, should a modification be in progress at the time <see cref="CloudFormationRunner.UpdateStackAsync"/> is called,
-        /// then that method will wait for the modification to complete, sending events to the <see cref="ILogger"/> interface prior to creating the update changeset.
+        /// For all stack modifications, if this is set then the method will not return until the stack operation completes,
+        /// sending events to the <see cref="ILogger"/> implementation.
         /// </para>
         /// </summary>
-        /// <param name="enable">If <c>true</c> (default), wait for stack action to complete, logging stack events to the given <see cref="ILogger"/> implementation.</param>
+        /// <param name="enable">If <c>true</c> (default), wait for stack action to complete.</param>
         /// <returns>The builder</returns>
         public CloudFormationBuilder WithFollowOperation(bool enable = true)
         {
