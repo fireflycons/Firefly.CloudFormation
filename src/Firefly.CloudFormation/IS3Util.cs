@@ -10,11 +10,10 @@
     /// <para>
     /// Interface describing methods that CloudFormation operations can use to upload oversize content
     /// (template or policy document) to S3 and to download template content from S3.
-    /// If an implementation of this interface is not provided to the <see cref="CloudFormationBuilder"/>,
-    /// then an attempt to run with oversize content (e.g. template body > 51,200 bytes) or to refer to a template in S3, then the operation will fail.
     /// </para>
     /// <para>
-    /// Example implementation.
+    /// If an implementation of this interface is not provided to the <see cref="CloudFormationBuilder"/>,
+    /// then an attempt to run with oversize content (e.g. template body > 51,200 bytes) or to refer to a template in S3, then the operation will fail.
     /// </para>
     /// </summary>
     /// <example>
@@ -33,15 +32,20 @@
     ///         UploadFileType uploadFileType)
     ///     {
     ///         var ms = new MemoryStream(
-    ///             new UTF8Encoding().GetBytes(body ?? throw new ArgumentNullException(nameof(body))));
+    ///             new UTF8Encoding().GetBytes(
+    ///                 body ?? throw new ArgumentNullException(nameof(body))));
     ///
     ///         var key = uploadFileType == UploadFileType.Template
     ///                       ? $"_{stackName}_template_{originalFilename}"
     ///                       : $"_{stackName}_policy_{originalFilename}";
     ///
-    ///         var ub = new UriBuilder($"https://{this.BucketName}.s3.amazonaws.com") { Path = $"/{key}" };
+    ///         var ub = new UriBuilder($"https://{this.BucketName}.s3.amazonaws.com")
+    ///                  {
+    ///                      Path = $"/{key}"
+    ///                  };
     ///
-    ///         this.logger.LogInformation($"Copying oversize {uploadFileType.ToString().ToLower()} to {ub.Uri}");
+    ///         this.logger.LogInformation(
+    ///             $"Copying oversize {uploadFileType.ToString().ToLower()} to {ub.Uri}");
     ///
     ///         await this.s3Client.PutObjectAsync(
     ///             new PutObjectRequest
@@ -57,7 +61,9 @@
     ///
     ///     public async Task&lt;string&gt; GetS3ObjectContent(string bucketName, string key)
     ///     {
-    ///         using (var response = await this.s3.GetObjectAsync(new GetObjectRequest { BucketName = bucketName, Key = key }))
+    ///         using (var response = await this.s3.GetObjectAsync(
+    ///             new GetObjectRequest {
+    ///                 BucketName = bucketName, Key = key }))
     ///         {
     ///             using (var sr = new StreamReader(response.ResponseStream))
     ///             {
@@ -76,7 +82,8 @@
         /// </para>
         /// <para>
         /// This method is called by <see cref="AbstractFileResolver"/> when <see cref="CloudFormationRunner.CreateStackAsync"/>
-        /// or <see cref="CloudFormationRunner.UpdateStackAsync"/> to upload oversize local content to S3.
+        /// or <see cref="CloudFormationRunner.UpdateStackAsync"/> resolve local content and find it to be above the maximum permitted
+        /// size, so need to upload it to S3.
         /// </para>
         /// <para>
         /// It is the responsibility of the implementation to provide the destination bucket.
