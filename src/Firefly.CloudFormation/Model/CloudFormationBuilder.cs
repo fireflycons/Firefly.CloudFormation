@@ -17,6 +17,8 @@ namespace Firefly.CloudFormation.Model
     /// Fluent builder pattern implementation for <see cref="CloudFormationRunner"/>
     /// </para>
     /// <para>
+    /// A builder is constructed by calling the static method <see cref="CloudFormationRunner.Builder"/>
+    /// </para>
     /// <example>
     /// <code>
     /// var builder = CloudFormationRunner.Builder(new MyCloudFormationContext(), "my-stack");
@@ -29,8 +31,6 @@ namespace Firefly.CloudFormation.Model
     /// await runner.CreateStackAsync();
     /// </code>
     /// </example>
-    /// A builder is constructed by calling the static method <see cref="CloudFormationRunner.Builder"/>
-    /// </para>
     /// </summary>
     public class CloudFormationBuilder
     {
