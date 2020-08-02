@@ -26,8 +26,6 @@ if (-not ($canPublishDocs -and ($isReleasePublication -or $forceDocPush)))
 
 Push-Location (Join-Path $env:APPVEYOR_BUILD_FOLDER "../fireflycons.github.io")
 
-gci Firefly-CloudFormation/api
-
 try
 {
     # Stage any changes, suppressing line ending warnings (nearly all at least)
