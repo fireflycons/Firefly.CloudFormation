@@ -15,7 +15,7 @@ if (-not $isAppVeyor)
     return
 }
 
-if (-not ($canPublishDocs -and ($isReleasePublication -or -not [string]::IsNullOrEmpty($env:FORCE_DOC_PUSH))))
+if (-not ($canPublishDocs -and ($isReleasePublication -or $forceDocPush)))
 {
     Write-Host "Cannot publish docs in forked repo or if not publishing a release"
     return

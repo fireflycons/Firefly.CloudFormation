@@ -53,7 +53,7 @@ if (-not $isAppVeyor)
     return
 }
 
-if (-not $isReleasePublication)
+if (-not ($isReleasePublication -or $forceDocPush))
 {
     Write-Host "Not cloning documentation site as this isn't a publish build"
     return
