@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Description>This library provides a nicer interface for managing AWS CloudFormation stacks.</Description>
+    <Description>This library provides a cleaner interface for managing AWS CloudFormation stacks.</Description>
     <Copyright>Copyright (c) 2020 Firefly Consulting Ltd.</Copyright>
     <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>

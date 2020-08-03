@@ -18,6 +18,9 @@
         /// <summary>
         /// Regex to identify errors in a stack event
         /// </summary>
+        /// <value>
+        /// Matches ROLLBACK or FAILED
+        /// </value>
         protected static readonly Regex ErrorStatus = new Regex("(ROLLBACK|FAILED)");
 
         /// <summary>
