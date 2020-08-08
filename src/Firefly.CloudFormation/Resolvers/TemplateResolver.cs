@@ -29,8 +29,9 @@
         /// <param name="context">The context.</param>
         /// <param name="stackName">Name of the stack.</param>
         /// <param name="usePreviousTemplate">if set to <c>true</c> reuse the existing template that is associated with the stack that you are updating.</param>
-        public TemplateResolver(ICloudFormationContext context, string stackName, bool usePreviousTemplate)
-            : this(new DefaultClientFactory(context), context, stackName, usePreviousTemplate)
+        /// <param name="forceS3">If set to <c>true</c>, force template upload to S3 even if less than max size.</param>
+        public TemplateResolver(ICloudFormationContext context, string stackName, bool usePreviousTemplate, bool forceS3)
+            : this(new DefaultClientFactory(context), context, stackName, usePreviousTemplate, forceS3)
         {
         }
 
@@ -41,12 +42,22 @@
         /// <param name="context">The context.</param>
         /// <param name="stackName">Name of the stack.</param>
         /// <param name="usePreviousTemplate">if set to <c>true</c> [use previous template].</param>
-        public TemplateResolver(IAwsClientFactory clientFactory, ICloudFormationContext context, string stackName, bool usePreviousTemplate)
+        /// <param name="forceS3">If set to <c>true</c>, force template upload to S3 even if less than max size.</param>
+        public TemplateResolver(IAwsClientFactory clientFactory, ICloudFormationContext context, string stackName, bool usePreviousTemplate, bool forceS3)
             : base(clientFactory, context)
         {
             this.usePreviousTemplate = usePreviousTemplate;
             this.stackName = stackName;
+            this.ForceS3 = forceS3;
         }
+
+        /// <summary>
+        /// Gets a value indicating whether to force upload of artifact to S3, even if lass than maximum size.
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if [force s3]; otherwise, <c>false</c>.
+        /// </value>
+        protected override bool ForceS3 { get; }
 
         /// <summary>
         /// Gets the maximum size of the file.

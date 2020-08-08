@@ -36,7 +36,7 @@
 
             mockClientFactory.Setup(f => f.CreateCloudFormationClient()).Returns(mockCf.Object);
 
-            var resolver = new TemplateResolver(mockClientFactory.Object, null, StackName, true);
+            var resolver = new TemplateResolver(mockClientFactory.Object, null, StackName, true, false);
             await resolver.ResolveFileAsync(null);
 
             resolver.Source.Should().Be(InputFileSource.UsePreviousTemplate);
@@ -48,7 +48,7 @@
         public async Task ShouldResolveLocalFileTemplate()
         {
             var mockClientFactory = TestHelpers.GetClientFactoryMock();
-            var resolver = new TemplateResolver(mockClientFactory.Object, null, StackName, false);
+            var resolver = new TemplateResolver(mockClientFactory.Object, null, StackName, false, false);
 
             using var tempfile = new TempFile(EmbeddedResourceManager.GetResourceStream("test-stack.json"));
             await resolver.ResolveFileAsync(tempfile.Path);
@@ -61,9 +61,22 @@
         public async Task ShouldResolveOversizeFileTemplateAsOversizeFile()
         {
             var mockClientFactory = TestHelpers.GetClientFactoryMock();
-            var resolver = new TemplateResolver(mockClientFactory.Object, null, StackName, false);
+            var resolver = new TemplateResolver(mockClientFactory.Object, null, StackName, false, false);
 
             using var tempfile = new TempFile(EmbeddedResourceManager.GetResourceStream("test-oversize.json"));
+            await resolver.ResolveFileAsync(tempfile.Path);
+
+            resolver.Source.Should().Be(InputFileSource.File | InputFileSource.Oversize);
+            resolver.ArtifactContent.Should().NotBeNullOrEmpty();
+        }
+
+        [Fact]
+        public async Task ShouldResolveSmallFileTemplateAsOversizeFileWhenForceS3IsSet()
+        {
+            var mockClientFactory = TestHelpers.GetClientFactoryMock();
+            var resolver = new TemplateResolver(mockClientFactory.Object, null, StackName, false, true);
+
+            using var tempfile = new TempFile(EmbeddedResourceManager.GetResourceStream("test-stack.json"));
             await resolver.ResolveFileAsync(tempfile.Path);
 
             resolver.Source.Should().Be(InputFileSource.File | InputFileSource.Oversize);
@@ -74,7 +87,7 @@
         public async Task ShouldResolveStringTemplate()
         {
             var mockClientFactory = TestHelpers.GetClientFactoryMock();
-            var resolver = new TemplateResolver(mockClientFactory.Object, null, StackName, false);
+            var resolver = new TemplateResolver(mockClientFactory.Object, null, StackName, false, false);
 
             var str = EmbeddedResourceManager.GetResourceString("test-stack.json");
             await resolver.ResolveFileAsync(str);
@@ -87,9 +100,22 @@
         public async Task ShouldResolveOversizeStringTemplateAsOversizeString()
         {
             var mockClientFactory = TestHelpers.GetClientFactoryMock();
-            var resolver = new TemplateResolver(mockClientFactory.Object, null, StackName, false);
+            var resolver = new TemplateResolver(mockClientFactory.Object, null, StackName, false, false);
 
             var str = EmbeddedResourceManager.GetResourceString("test-oversize.json");
+            await resolver.ResolveFileAsync(str);
+
+            resolver.Source.Should().Be(InputFileSource.String | InputFileSource.Oversize);
+            resolver.ArtifactContent.Should().NotBeNullOrEmpty();
+        }
+
+        [Fact]
+        public async Task ShouldResolveSmallStringTemplateAsOversizeStringWhenForceS3IsSet()
+        {
+            var mockClientFactory = TestHelpers.GetClientFactoryMock();
+            var resolver = new TemplateResolver(mockClientFactory.Object, null, StackName, false, true);
+
+            var str = EmbeddedResourceManager.GetResourceString("test-stack.json");
             await resolver.ResolveFileAsync(str);
 
             resolver.Source.Should().Be(InputFileSource.String | InputFileSource.Oversize);
@@ -114,7 +140,7 @@
             mockContext.Setup(c => c.S3Util).Returns(mockS3Util.Object);
 
             // TODO - Fix me
-            var resolver = new TemplateResolver(mockClientFactory.Object, mockContext.Object, StackName, false);
+            var resolver = new TemplateResolver(mockClientFactory.Object, mockContext.Object, StackName, false, false);
 
             await resolver.ResolveFileAsync(url);
 
@@ -138,7 +164,7 @@
 
             mockContext.Setup(c => c.S3Util).Returns(mockS3Util.Object);
 
-            var resolver = new TemplateResolver(mockClientFactory.Object, mockContext.Object, StackName, false);
+            var resolver = new TemplateResolver(mockClientFactory.Object, mockContext.Object, StackName, false, false);
 
             await resolver.ResolveFileAsync(url);
 
@@ -155,7 +181,7 @@
         {
             var mockClientFactory = new Mock<IAwsClientFactory>();
 
-            var resolver = new TemplateResolver(mockClientFactory.Object, null, StackName, false);
+            var resolver = new TemplateResolver(mockClientFactory.Object, null, StackName, false, false);
 
             Func<Task> action = async () => await resolver.ResolveFileAsync(url);
 
@@ -168,7 +194,7 @@
         {
             var mockClientFactory = new Mock<IAwsClientFactory>();
 
-            var resolver = new TemplateResolver(mockClientFactory.Object, null, StackName, false);
+            var resolver = new TemplateResolver(mockClientFactory.Object, null, StackName, false, false);
 
             Func<Task> action = async () => await resolver.ResolveFileAsync("https://jbarr-public.s3.amazonaws.com/");
 

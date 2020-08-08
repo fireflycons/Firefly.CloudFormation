@@ -177,6 +177,8 @@ namespace Firefly.CloudFormation
         /// <summary>Whether to follow an in-progress operation.</summary>
         private bool followOperation;
 
+        private readonly bool forceS3;
+
         #endregion
 
         #region Constructor
@@ -207,6 +209,7 @@ namespace Firefly.CloudFormation
         /// <param name="timeoutInMinutes">The amount of time that can pass before the stack status becomes CREATE_FAILED</param>
         /// <param name="disableRollback">Set to <c>true</c> to disable rollback of the stack if stack creation failed.</param>
         /// <param name="retainResource">For stacks in the DELETE_FAILED state, a list of resource logical IDs that are associated with the resources you want to retain.</param>
+        /// <param name="forceS3">If <c>true</c> always upload local templates to S3.</param>
         /// <remarks>Constructor is private as this class implements the builder pattern. See CloudFormation.Runner.Builder.cs</remarks>
         internal CloudFormationRunner(
             IAwsClientFactory clientFactory,
@@ -234,8 +237,10 @@ namespace Firefly.CloudFormation
             OnFailure onFailure,
             int timeoutInMinutes,
             bool disableRollback,
-            List<string> retainResource)
+            List<string> retainResource,
+            bool forceS3)
         {
+            this.forceS3 = forceS3;
             this.retainResource = retainResource;
             this.disableRollback = disableRollback;
             this.timeoutInMinutes = timeoutInMinutes;
@@ -285,7 +290,7 @@ namespace Firefly.CloudFormation
             this.stackOperations = new CloudFormationOperations(this.clientFactory, this.context);
 
             // Get parameters and description from supplied template if any
-            this.templateResolver = new TemplateResolver(this.clientFactory, this.context, this.stackName, this.usePreviousTemplate);
+            this.templateResolver = new TemplateResolver(this.clientFactory, this.context, this.stackName, this.usePreviousTemplate, this.forceS3);
 
             this.templateResolver.ResolveArtifactLocationAsync(this.context, this.templateLocation, this.stackName)
                 .Wait();
@@ -427,7 +432,7 @@ namespace Firefly.CloudFormation
             }
 
             // Resolve template from CloudFormation to get description if any
-            this.templateResolver = new TemplateResolver(this.clientFactory, this.context, this.stackName, true);
+            this.templateResolver = new TemplateResolver(this.clientFactory, this.context, this.stackName, true, this.forceS3);
             await this.templateResolver.ResolveFileAsync(null);
             
             var parser = TemplateParser.Create(this.templateResolver.FileContent);

@@ -350,6 +350,54 @@ namespace Firefly.CloudFormation.Tests.Unit.CloudFormation
         }
 
         /// <summary>
+        /// If caller set WithChangestOnly, then change set should be displayed and not applied.
+        /// </summary>
+        [Fact]
+        public async Task ShouldUploadToS3BeforeCreateChangesetIfForceS3IsSet()
+        {
+            var logger = new TestLogger(this.output);
+            var mockClientFactory = TestHelpers.GetClientFactoryMock();
+            var mockContext = TestHelpers.GetContextMock(logger);
+            var mockS3Util = TestHelpers.GetS3UtilMock();
+            var mockCloudFormation = new Mock<IAmazonCloudFormation>();
+
+            using var template = new TempFile(EmbeddedResourceManager.GetResourceStream("test-stack.json"));
+
+            mockContext.Setup(ctx => ctx.S3Util).Returns(mockS3Util.Object);
+
+            mockCloudFormation.SetupSequence(cf => cf.DescribeStacksAsync(It.IsAny<DescribeStacksRequest>(), default))
+                .ReturnsAsync(ResponseStackCreateComplete)
+                .ReturnsAsync(ResponseStackCreateComplete);
+
+            mockCloudFormation.Setup(cf => cf.CreateChangeSetAsync(It.IsAny<CreateChangeSetRequest>(), default))
+                .ReturnsAsync(new CreateChangeSetResponse { Id = "arn:aws:cloudformation:eu-west-1:123456789012:changeset/1234" });
+
+            mockCloudFormation.SetupSequence(cf => cf.DescribeChangeSetAsync(It.IsAny<DescribeChangeSetRequest>(), default))
+                .ReturnsAsync(new DescribeChangeSetResponse { Status = ChangeSetStatus.CREATE_IN_PROGRESS })
+                .ReturnsAsync(
+                    new DescribeChangeSetResponse
+                    {
+                        Status = ChangeSetStatus.CREATE_COMPLETE,
+                        Changes = StockChange
+                    });
+
+            mockClientFactory.Setup(f => f.CreateCloudFormationClient()).Returns(mockCloudFormation.Object);
+
+            var runner = CloudFormationRunner.Builder(mockContext.Object, StackName)
+                .WithClientFactory(mockClientFactory.Object).WithTemplateLocation(template.Path).WithChangesetOnly().WithForceS3().Build();
+
+            (await runner.UpdateStackAsync(null)).StackOperationResult.Should().Be(StackOperationResult.NoChange);
+            mockS3Util.Verify(s3 => s3.UploadOversizeArtifactToS3(
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<UploadFileType>()), Times.Exactly(1));
+
+            logger.InfoMessages.Last().Should().Be("Not updating stack since CreateChangesetOnly = true");
+            logger.ChangeSets.Count.Should().BeGreaterThan(0);
+        }
+
+        /// <summary>
         /// If caller's confirmation function returns <c>false</c>, then change set should be displayed and not applied.
         /// </summary>
         [Fact]

@@ -22,6 +22,11 @@
 
         public string Path => this.filePath;
 
+        public string GetContent()
+        {
+            return File.ReadAllText(this.Path);
+        }
+
         public void Dispose()
         {
             if (File.Exists(this.filePath))

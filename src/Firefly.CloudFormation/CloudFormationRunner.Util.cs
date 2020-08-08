@@ -239,7 +239,7 @@
 
             // TemplateResolver is good enough for our purposes here
             return ResourceImportParser.Create(
-                await new TemplateResolver(this.clientFactory, this.context, this.stackName, false)
+                await new TemplateResolver(this.clientFactory, this.context, this.stackName, false, this.forceS3)
                     .ResolveFileAsync(this.resourcesToImportLocation))
                 .GetResourcesToImport();
         }

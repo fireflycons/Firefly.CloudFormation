@@ -144,6 +144,11 @@ namespace Firefly.CloudFormation.Model
         private bool _waitForInProgressUpdate;
 
         /// <summary>
+        /// Whether to force upload of local template 
+        /// </summary>
+        private bool _forceS3;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="CloudFormationBuilder"/> class.
         /// </summary>
         /// <param name="context">The context.</param>
@@ -188,7 +193,8 @@ namespace Firefly.CloudFormation.Model
                 this._onFailure,
                 this._timeoutInMinutes,
                 this._disableRollback,
-                this._resourcesToRetain);
+                this._resourcesToRetain,
+                this._forceS3);
         }
 
         /// <summary>In some cases, you must explicitly acknowledge that your stack template contains certain capabilities in order for AWS CloudFormation to create the stack.
@@ -244,9 +250,24 @@ namespace Firefly.CloudFormation.Model
         /// <param name="delete">if set to <c>true</c> [delete].</param>
         /// <returns>The builder</returns>
         // ReSharper disable once UnusedMember.Global
-        public CloudFormationBuilder WithDeleteNoopChangeset(bool delete)
+        public CloudFormationBuilder WithDeleteNoopChangeset(bool delete = true)
         {
             this._deleteNoopChangeset = delete;
+            return this;
+        }
+
+        /// <summary>
+        /// Set whether to force upload of local template to S3, even if it is less than the maximum size for local templates.
+        /// </summary>
+        /// <param name="force">if set to <c>true</c>, always upload the template.</param>
+        /// <returns>The builder</returns>
+        /// <remarks>
+        /// At the time of writing there is a possible bug in <c>CreateChangeSetAsync</c> method whereby a socket closed by remote hast exception
+        /// may be thrown with a local template. If the template is uploaded to S3 first, then the issue goes away.
+        /// </remarks>
+        public CloudFormationBuilder WithForceS3(bool force = true)
+        {
+            this._forceS3 = force;
             return this;
         }
 

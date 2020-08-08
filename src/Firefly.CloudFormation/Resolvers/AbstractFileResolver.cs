@@ -91,6 +91,14 @@
         protected ICloudFormationContext Context { get; }
 
         /// <summary>
+        /// Gets a value indicating whether to force upload of artifact to S3, even if lass than maximum size.
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if [force s3]; otherwise, <c>false</c>.
+        /// </value>
+        protected abstract bool ForceS3 { get; }
+
+        /// <summary>
         /// Gets the maximum size of the file.
         /// If the file is on local file system and is larger than this number of bytes, it must first be uploaded to S3.
         /// </summary>
@@ -271,7 +279,7 @@
             this.InputFileName = Path.GetFileNameWithoutExtension(fileLocation);
 
             // ReSharper disable once AssignNullToNotNullAttribute - Existence is verified by the caller
-            if (new FileInfo(fileLocation).Length >= this.MaxFileSize)
+            if (this.ForceS3 || new FileInfo(fileLocation).Length >= this.MaxFileSize)
             {
                 this.Source |= InputFileSource.Oversize;
             }
@@ -292,7 +300,7 @@
             this.Source = InputFileSource.String;
             this.InputFileName = "RawString";
 
-            if (Encoding.UTF8.GetByteCount(stringContent) >= this.MaxFileSize)
+            if (this.ForceS3 || Encoding.UTF8.GetByteCount(stringContent) >= this.MaxFileSize)
             {
                 this.Source |= InputFileSource.Oversize;
             }

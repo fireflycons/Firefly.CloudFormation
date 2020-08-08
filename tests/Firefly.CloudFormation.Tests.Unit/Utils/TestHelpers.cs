@@ -1,10 +1,10 @@
 ﻿namespace Firefly.CloudFormation.Tests.Unit.Utils
 {
-    using System.Collections.Generic;
+    using System;
 
     using Amazon;
 
-    using Firefly.CloudFormation.Utils;
+    using Firefly.CloudFormation.Model;
 
     using Moq;
 
@@ -16,6 +16,16 @@
 
         public static readonly string RegionName = Region.SystemName;
 
+        public static readonly string CloudFormationBucketName =
+            $"cf-templates-pscloudformation-{RegionName}-{AccountId}";
+
+        internal static Mock<IAwsClientFactory> GetClientFactoryMock()
+        {
+            var mock = new Mock<IAwsClientFactory>();
+
+            return mock;
+        }
+
         internal static Mock<ICloudFormationContext> GetContextMock(TestLogger logger)
         {
             var mockContext = new Mock<ICloudFormationContext>();
@@ -26,11 +36,35 @@
             return mockContext;
         }
 
-        internal static Mock<IAwsClientFactory> GetClientFactoryMock()
+        internal static Mock<IS3Util> GetS3UtilMock()
         {
-            var mock = new Mock<IAwsClientFactory>();
+            var mockS3Util = new Mock<IS3Util>();
 
-            return mock;
+            mockS3Util
+                .Setup(
+                    s3 => s3.UploadOversizeArtifactToS3(
+                        It.IsAny<string>(),
+                        It.IsAny<string>(),
+                        It.IsAny<string>(),
+                        It.IsAny<UploadFileType>())).ReturnsAsync(
+                    new Uri($"https://{TestHelpers.CloudFormationBucketName}/template-file"));
+
+            return mockS3Util;
+        }
+
+        /// <summary>
+        /// Mock that also supports GetS3ObjectContent
+        /// </summary>
+        /// <param name="tempfile">The tempfile.</param>
+        /// <returns>The mock</returns>
+        internal static Mock<IS3Util> GetS3UtilMock(TempFile tempfile)
+        {
+            var mockS3Util = GetS3UtilMock();
+
+             mockS3Util.Setup(s3 => s3.GetS3ObjectContent(It.IsAny<string>(), It.IsAny<string>()))
+            .ReturnsAsync(tempfile.GetContent());
+
+            return mockS3Util;
         }
     }
 }
