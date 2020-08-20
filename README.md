@@ -2,6 +2,8 @@
 
 [![Build status](https://ci.appveyor.com/api/projects/status/qlsak3rsjx8vypha/branch/master?svg=true)](https://ci.appveyor.com/project/fireflycons/firefly-cloudformation/branch/master)
 
+![Nuget](https://img.shields.io/nuget/v/Firefly.CloudFormation)
+
 A library to wrap primarily the main AWSSDK CloudFormation operations [CreateStack](https://docs.aws.amazon.com/sdkfornet/v3/apidocs/items/CloudFormation/MCloudFormationCreateStackCreateStackRequest.html), [CreateChangeset](https://docs.aws.amazon.com/sdkfornet/v3/apidocs/items/CloudFormation/MCloudFormationCreateChangeSetCreateChangeSetRequest.html), [UpdateStack](https://docs.aws.amazon.com/sdkfornet/v3/apidocs/items/CloudFormation/MCloudFormationUpdateStackUpdateStackRequest.html) and [DeleteStack](https://docs.aws.amazon.com/sdkfornet/v3/apidocs/items/CloudFormation/MCloudFormationDeleteStackDeleteStackRequest.html).
 
 
