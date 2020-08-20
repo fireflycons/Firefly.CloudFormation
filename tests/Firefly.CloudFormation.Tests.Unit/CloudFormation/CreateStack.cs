@@ -8,7 +8,6 @@
     using Amazon.CloudFormation.Model;
 
     using Firefly.CloudFormation.Model;
-    using Firefly.CloudFormation.Tests.Unit.resources;
     using Firefly.CloudFormation.Tests.Unit.Utils;
 
     using FluentAssertions;
@@ -18,7 +17,7 @@
     using Xunit;
     using Xunit.Abstractions;
 
-    public class CreateStack
+    public class CreateStack : IClassFixture<TestStackFixture>
     {
         /// <summary>
         /// The stack name
@@ -36,12 +35,16 @@
         /// </summary>
         private readonly ITestOutputHelper output;
 
+        private readonly TestStackFixture fixture;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="CreateStack"/> class.
         /// </summary>
+        /// <param name="fixture">Test fixture</param>
         /// <param name="output">The output.</param>
-        public CreateStack(ITestOutputHelper output)
+        public CreateStack(TestStackFixture fixture, ITestOutputHelper output)
         {
+            this.fixture = fixture;
             this.output = output;
         }
 
@@ -95,11 +98,10 @@
 
             mockClientFactory.Setup(f => f.CreateCloudFormationClient()).Returns(mockCloudFormation.Object);
 
-            using var template = new TempFile(EmbeddedResourceManager.GetResourceStream("test-stack.json"));
             var runner = CloudFormationRunner.Builder(mockContext.Object, StackName)
                 .WithClientFactory(mockClientFactory.Object)
                 .WithFollowOperation()
-                .WithTemplateLocation(template.Path)
+                .WithTemplateLocation(this.fixture.TestStackJsonTemplate.FullPath)
                 .Build();
 
             (await runner.CreateStackAsync()).StackOperationResult.Should().Be(StackOperationResult.StackCreated);
@@ -159,11 +161,10 @@
 
             mockClientFactory.Setup(f => f.CreateCloudFormationClient()).Returns(mockCloudFormation.Object);
 
-            using var template = new TempFile(EmbeddedResourceManager.GetResourceStream("test-stack.json"));
             var runner = CloudFormationRunner.Builder(mockContext.Object, StackName)
                 .WithClientFactory(mockClientFactory.Object)
                 .WithFollowOperation()
-                .WithTemplateLocation(template.Path)
+                .WithTemplateLocation(this.fixture.TestStackJsonTemplate.FullPath)
                 .WithForceS3()
                 .Build();
 
@@ -194,10 +195,9 @@
 
             mockClientFactory.Setup(f => f.CreateCloudFormationClient()).Returns(mockCloudFormation.Object);
 
-            using var template = new TempFile(EmbeddedResourceManager.GetResourceStream("test-stack.json"));
             var runner = CloudFormationRunner.Builder(mockContext.Object, StackName)
                 .WithClientFactory(mockClientFactory.Object)
-                .WithTemplateLocation(template.Path)
+                .WithTemplateLocation(this.fixture.TestStackJsonTemplate.FullPath)
                 .Build();
 
             Func<Task<CloudFormationResult>> action = async () => await runner.CreateStackAsync();

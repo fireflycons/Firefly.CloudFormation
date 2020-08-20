@@ -1,8 +1,11 @@
 ﻿namespace Firefly.CloudFormation.Tests.Unit.CloudFormation.Parsers
 {
+    // ReSharper disable StyleCop.SA1600
+    #pragma warning disable 649
+
     using System.Linq;
 
-    using Firefly.CloudFormation.Tests.Unit.resources;
+    using Firefly.EmbeddedResourceLoader;
 
     using FluentAssertions;
 
@@ -12,15 +15,20 @@
     /// Tests updating of resource properties within a template.
     /// You would need to do this to implement the behaviour of <c>aws cloudformation package</c>
     /// </summary>
-    public class ResourcePropertyUpdate
+    public class ResourcePropertyUpdate : AutoResourceLoader
     {
+        [EmbeddedResource("test-resource-update.json")]
+        private static string testResourceUpdateJson;
+
+        [EmbeddedResource("test-resource-update.yaml")]
+        private static string testResourceUpdateYaml;
+
         [Fact]
         public void UpdateJsonResource()
         {
             const string S3Location = "s3://bucket/job.etl";
 
-            var parser = Firefly.CloudFormation.Parsers.TemplateParser.Create(
-                EmbeddedResourceManager.GetResourceString("test-resource-update.json"));
+            var parser = Firefly.CloudFormation.Parsers.TemplateParser.Create(testResourceUpdateJson);
             var resources = parser.GetResources();
 
             var resource = resources.First(r => r.LogicalName == "MyJob");
@@ -39,8 +47,7 @@
             const string S3Bucket = "bucket-name";
             const string S3Key = "code/lambda.zip";
 
-            var parser = Firefly.CloudFormation.Parsers.TemplateParser.Create(
-                EmbeddedResourceManager.GetResourceString("test-resource-update.yaml"));
+            var parser = Firefly.CloudFormation.Parsers.TemplateParser.Create(testResourceUpdateYaml);
             var resources = parser.GetResources();
 
             var resource = resources.First(r => r.LogicalName == "lambdaFunction");

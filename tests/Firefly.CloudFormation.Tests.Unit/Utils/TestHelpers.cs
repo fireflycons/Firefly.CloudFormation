@@ -51,20 +51,5 @@
 
             return mockS3Util;
         }
-
-        /// <summary>
-        /// Mock that also supports GetS3ObjectContent
-        /// </summary>
-        /// <param name="tempfile">The tempfile.</param>
-        /// <returns>The mock</returns>
-        internal static Mock<IS3Util> GetS3UtilMock(TempFile tempfile)
-        {
-            var mockS3Util = GetS3UtilMock();
-
-             mockS3Util.Setup(s3 => s3.GetS3ObjectContent(It.IsAny<string>(), It.IsAny<string>()))
-            .ReturnsAsync(tempfile.GetContent());
-
-            return mockS3Util;
-        }
     }
 }

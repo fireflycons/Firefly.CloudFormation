@@ -8,7 +8,6 @@
     using Amazon.CloudFormation.Model;
 
     using Firefly.CloudFormation.Model;
-    using Firefly.CloudFormation.Tests.Unit.resources;
     using Firefly.CloudFormation.Tests.Unit.Utils;
 
     using FluentAssertions;
@@ -18,7 +17,7 @@
     using Xunit;
     using Xunit.Abstractions;
 
-    public class DeleteStack
+    public class DeleteStack : IClassFixture<TestStackFixture>
     {
         /// <summary>
         /// The stack name
@@ -36,12 +35,15 @@
         /// </summary>
         private readonly ITestOutputHelper output;
 
+        private readonly TestStackFixture fixture;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="DeleteStack"/> class.
         /// </summary>
         /// <param name="output">The output.</param>
-        public DeleteStack(ITestOutputHelper output)
+        public DeleteStack(TestStackFixture fixture, ITestOutputHelper output)
         {
+            this.fixture = fixture;
             this.output = output;
         }
 
@@ -150,7 +152,7 @@
             mockCloudFormation.Setup(cf => cf.GetTemplateAsync(It.IsAny<GetTemplateRequest>(), default)).ReturnsAsync(
                 new GetTemplateResponse
                     {
-                        TemplateBody = EmbeddedResourceManager.GetResourceString("test-stack.json")
+                        TemplateBody = this.fixture.TestStackJsonString
                     });
 
             mockClientFactory.Setup(f => f.CreateCloudFormationClient()).Returns(mockCloudFormation.Object);

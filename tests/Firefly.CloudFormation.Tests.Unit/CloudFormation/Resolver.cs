@@ -8,9 +8,7 @@
 
     using Firefly.CloudFormation.Model;
     using Firefly.CloudFormation.Resolvers;
-    using Firefly.CloudFormation.Tests.Unit.resources;
     using Firefly.CloudFormation.Tests.Unit.Utils;
-    using Firefly.CloudFormation.Utils;
 
     using FluentAssertions;
 
@@ -18,11 +16,16 @@
 
     using Xunit;
 
-    using TempFile = Utils.TempFile;
-
-    public class Resolver
+    public class Resolver : IClassFixture<TestStackFixture>
     {
+        private readonly TestStackFixture fixture;
+
         const string StackName = "test-stack";
+
+        public Resolver(TestStackFixture fixture)
+        {
+            this.fixture = fixture;
+        }
 
         [Fact]
         public async Task ShouldResolveExistingTemplateWhenUsePreviousTemplateIsSelected()
@@ -30,7 +33,7 @@
             var mockCf = new Mock<IAmazonCloudFormation>();
 
             mockCf.Setup(cf => cf.GetTemplateAsync(It.IsAny<GetTemplateRequest>(), default)).ReturnsAsync(
-                new GetTemplateResponse { TemplateBody = EmbeddedResourceManager.GetResourceString("test-stack.json") });
+                new GetTemplateResponse { TemplateBody = this.fixture.TestStackJsonString });
 
             var mockClientFactory = new Mock<IAwsClientFactory>();
 
@@ -50,8 +53,7 @@
             var mockClientFactory = TestHelpers.GetClientFactoryMock();
             var resolver = new TemplateResolver(mockClientFactory.Object, null, StackName, false, false);
 
-            using var tempfile = new TempFile(EmbeddedResourceManager.GetResourceStream("test-stack.json"));
-            await resolver.ResolveFileAsync(tempfile.Path);
+            await resolver.ResolveFileAsync(this.fixture.TestStackJsonTemplate.FullPath);
 
             resolver.Source.Should().Be(InputFileSource.File);
             resolver.ArtifactContent.Should().NotBeNullOrEmpty();
@@ -63,8 +65,7 @@
             var mockClientFactory = TestHelpers.GetClientFactoryMock();
             var resolver = new TemplateResolver(mockClientFactory.Object, null, StackName, false, false);
 
-            using var tempfile = new TempFile(EmbeddedResourceManager.GetResourceStream("test-oversize.json"));
-            await resolver.ResolveFileAsync(tempfile.Path);
+            await resolver.ResolveFileAsync(this.fixture.TestOversizedStackJsonTemplate.FullPath);
 
             resolver.Source.Should().Be(InputFileSource.File | InputFileSource.Oversize);
             resolver.ArtifactContent.Should().NotBeNullOrEmpty();
@@ -76,8 +77,7 @@
             var mockClientFactory = TestHelpers.GetClientFactoryMock();
             var resolver = new TemplateResolver(mockClientFactory.Object, null, StackName, false, true);
 
-            using var tempfile = new TempFile(EmbeddedResourceManager.GetResourceStream("test-stack.json"));
-            await resolver.ResolveFileAsync(tempfile.Path);
+            await resolver.ResolveFileAsync(this.fixture.TestStackJsonTemplate.FullPath);
 
             resolver.Source.Should().Be(InputFileSource.File | InputFileSource.Oversize);
             resolver.ArtifactContent.Should().NotBeNullOrEmpty();
@@ -89,8 +89,7 @@
             var mockClientFactory = TestHelpers.GetClientFactoryMock();
             var resolver = new TemplateResolver(mockClientFactory.Object, null, StackName, false, false);
 
-            var str = EmbeddedResourceManager.GetResourceString("test-stack.json");
-            await resolver.ResolveFileAsync(str);
+            await resolver.ResolveFileAsync(this.fixture.TestStackJsonString);
 
             resolver.Source.Should().Be(InputFileSource.String);
             resolver.ArtifactContent.Should().NotBeNullOrEmpty();
@@ -102,8 +101,7 @@
             var mockClientFactory = TestHelpers.GetClientFactoryMock();
             var resolver = new TemplateResolver(mockClientFactory.Object, null, StackName, false, false);
 
-            var str = EmbeddedResourceManager.GetResourceString("test-oversize.json");
-            await resolver.ResolveFileAsync(str);
+            await resolver.ResolveFileAsync(this.fixture.TestOversizedStackJsonString);
 
             resolver.Source.Should().Be(InputFileSource.String | InputFileSource.Oversize);
             resolver.ArtifactContent.Should().NotBeNullOrEmpty();
@@ -115,8 +113,7 @@
             var mockClientFactory = TestHelpers.GetClientFactoryMock();
             var resolver = new TemplateResolver(mockClientFactory.Object, null, StackName, false, true);
 
-            var str = EmbeddedResourceManager.GetResourceString("test-stack.json");
-            await resolver.ResolveFileAsync(str);
+            await resolver.ResolveFileAsync(this.fixture.TestStackJsonString);
 
             resolver.Source.Should().Be(InputFileSource.String | InputFileSource.Oversize);
             resolver.ArtifactContent.Should().NotBeNullOrEmpty();
@@ -133,7 +130,7 @@
             var mockS3Util = new Mock<IS3Util>();
 
             mockS3Util.Setup(s3 => s3.GetS3ObjectContent(It.IsAny<string>(), It.IsAny<string>()))
-                .ReturnsAsync(EmbeddedResourceManager.GetResourceString("test-stack.json"));
+                .ReturnsAsync(this.fixture.TestStackJsonString);
 
             var mockContext = new Mock<ICloudFormationContext>();
 
@@ -158,7 +155,7 @@
             var mockS3Util = new Mock<IS3Util>();
 
             mockS3Util.Setup(s3 => s3.GetS3ObjectContent(It.IsAny<string>(), It.IsAny<string>()))
-                .ReturnsAsync(EmbeddedResourceManager.GetResourceString("test-stack.json"));
+                .ReturnsAsync(this.fixture.TestStackJsonString);
 
             var mockContext = new Mock<ICloudFormationContext>();
 

@@ -1,21 +1,25 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Firefly.CloudFormation.Tests.Unit.CloudFormation.Parsers
+﻿namespace Firefly.CloudFormation.Tests.Unit.CloudFormation.Parsers
 {
-    using Firefly.CloudFormation.Tests.Unit.resources;
+    // ReSharper disable StyleCop.SA1600
+    #pragma warning disable 649
 
-    public class ParameterFileParserFixture : IDisposable
+    using System;
+    using System.Collections.Generic;
+
+    using Firefly.EmbeddedResourceLoader;
+
+    public class ParameterFileParserFixture : AutoResourceLoader, IDisposable
     {
+        [EmbeddedResource("parameter-file.json")]
+        private string jsonParameterFile;
+
+        [EmbeddedResource("parameter-file.yaml")]
+        private string yamlParameterFile;
+
         public ParameterFileParserFixture()
         {
-            var jsonParser =
-                Firefly.CloudFormation.Parsers.ParameterFileParser.CreateParser(
-                    EmbeddedResourceManager.GetResourceString("parameter-file.json"));
-            var yamlParser =
-                Firefly.CloudFormation.Parsers.ParameterFileParser.CreateParser(
-                    EmbeddedResourceManager.GetResourceString("parameter-file.yaml"));
+            var jsonParser = Firefly.CloudFormation.Parsers.ParameterFileParser.CreateParser(this.jsonParameterFile);
+            var yamlParser = Firefly.CloudFormation.Parsers.ParameterFileParser.CreateParser(this.yamlParameterFile);
 
             this.JsonParameters = jsonParser.ParseParameterFile();
             this.YamlParameters = yamlParser.ParseParameterFile();
