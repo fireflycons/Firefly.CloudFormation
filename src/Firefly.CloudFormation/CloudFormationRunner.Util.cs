@@ -217,7 +217,9 @@
                 foreach (var nested in (await PollyHelper.ExecuteWithPolly(
                                             () => this.client.DescribeStackResourcesAsync(
                                                 new DescribeStackResourcesRequest { StackName = stackArnLocal })))
-                    .StackResources.Where(r => r.ResourceType == "AWS::CloudFormation::Stack"))
+                    .StackResources.Where(
+                        r => r.ResourceType == "AWS::CloudFormation::Stack"
+                             && !string.IsNullOrEmpty(r.PhysicalResourceId)))
                 {
                     allEvents.AddRange(await GetEventsAsync(nested.PhysicalResourceId));
                 }

@@ -1,3 +1,8 @@
+# 0.2.1 
+
+Address potential race condition when monitoring stack events during creation of set of nested stacks.
+It seems it's possible to retrieve a nested stack resource prior to it being assigned a physical resource ID.
+
 # 0.2.0
 
 Add ForceS3 mechanism
