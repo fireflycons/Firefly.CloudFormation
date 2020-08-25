@@ -404,8 +404,12 @@ namespace Firefly.CloudFormation
         /// Function to confirm delete if user passed resources to retain when the stack is not in a failed state due to resources that could not be deleted.
         /// If this parameter is <c>null</c>, or the function returns true, then all resources are deleted. 
         /// </param>
+        /// <param name="queryDeleteStackFunc">
+        /// Function to confirm whether to delete the stack at all.
+        /// If this parameter is <c>null</c>, or the function returns true, then the delete proceeds. 
+        /// </param>
         /// <returns>Operation result.</returns>
-        public async Task<CloudFormationResult> DeleteStackAsync(Func<bool> invalidRetentionConfirmationFunc = null)
+        public async Task<CloudFormationResult> DeleteStackAsync(Func<bool> invalidRetentionConfirmationFunc = null, Func<bool> queryDeleteStackFunc = null)
         {
             var stack = await this.stackOperations.GetStackAsync(this.stackName);
             var operationalState = await this.stackOperations.GetStackOperationalStateAsync(stack.StackId);
@@ -415,6 +419,14 @@ namespace Firefly.CloudFormation
             if (operationalState != StackOperationalState.Ready && operationalState != StackOperationalState.DeleteFailed)
             {
                 throw new StackOperationException(stack, operationalState);
+            }
+
+            if (queryDeleteStackFunc != null && !queryDeleteStackFunc())
+            {
+                return new CloudFormationResult
+                           {
+                               StackArn = stack.StackId, StackOperationResult = StackOperationResult.NoChange
+                           };
             }
 
             if (operationalState != StackOperationalState.DeleteFailed && haveRetainResources && invalidRetentionConfirmationFunc != null)
