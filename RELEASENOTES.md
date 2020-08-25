@@ -1,3 +1,9 @@
+# 0.2.2
+
+Add an additional Func parameter to DeleteStackAsync to give clients a way of asking "Do you want to delete the stack" from within the method, such that the correct object is returned.
+
+Needed for [this PSCloudFormation](https://github.com/fireflycons/PSCloudFormation/issues/68) isuue
+
 # 0.2.1 
 
 Address potential race condition when monitoring stack events during creation of set of nested stacks.
