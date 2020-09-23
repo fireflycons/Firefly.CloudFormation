@@ -1,4 +1,5 @@
 #addin nuget:?package=Newtonsoft.Json&version=12.0.3
+#addin nuget:?package=Cake.Http&version=0.7.0
 
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -31,6 +32,9 @@ Version buildVersion;
 DirectoryPath docFxSite;
 
 var solutionFile = File("../Firefly.CloudFormation.sln");
+var documentationPath = "Firefly-CloudFormation";
+var documentationBaseUrl = $"https://firefly-cons.github.io/{documentationPath}";
+var xrefMapServiceEndpoint = "https://xref.docs.firefly-consulting.co.uk";
 
 Task("Init")
     .Does(() => {
@@ -142,7 +146,7 @@ Task("CopyDocumentationTo-github.io-clone")
     .WithCriteria(isReleasePublication || !string.IsNullOrEmpty(EnvironmentVariable("FORCE_DOC_PUSH")))
     .Does(() => {
 
-        var outputDir = MakeAbsolute(Directory(System.IO.Path.Combine(EnvironmentVariableStrict("APPVEYOR_BUILD_FOLDER"), "..", "fireflycons.github.io", "Firefly-CloudFormation")));
+        var outputDir = MakeAbsolute(Directory(System.IO.Path.Combine(EnvironmentVariableStrict("APPVEYOR_BUILD_FOLDER"), "..", "fireflycons.github.io", documentationPath)));
 
         Information($"Updating documentation in {outputDir}");
 
@@ -155,6 +159,47 @@ Task("CopyDocumentationTo-github.io-clone")
         }
 
         CopyDirectory(docFxSite, outputDir);
+    });
+
+Task("UploadXrefMap")
+    .WithCriteria(IsRunningOnWindows())
+    .WithCriteria(isReleasePublication || !string.IsNullOrEmpty(EnvironmentVariable("FORCE_XREF_PUSH")))
+    .Does(() => {
+
+        string apiKey;
+        var xrefmap = docFxSite.CombineWithFilePath(new FilePath("xrefmap.yml"));
+
+        if (!FileExists(xrefmap))
+        {
+            Warning($"Cannot find '{xrefmap}'");
+            return;
+        }
+
+        if ((apiKey = EnvironmentVariable<string>("XREFMAP_APIKEY", null)) == null)
+        {
+            Warning("Cannot find environment variable XREFMAP_APIKEY");
+            return;
+        }
+
+        // Here we assume that mainProjectFile filename is the root namespace of what we're publishing
+        var ns = mainProjectFile.GetFilenameWithoutExtension().ToString();
+
+        var json = JsonConvert.SerializeObject(new {
+            baseUrl = documentationBaseUrl,
+            xrefmap = System.IO.File.ReadAllText(xrefmap.ToString())
+        });
+
+        var pushUrl = $"{xrefMapServiceEndpoint.Trim('/')}/xrefmap/{ns}";
+        Information($"Pushing XRefMap to {pushUrl}");
+
+        var result = HttpPut(pushUrl, new HttpSettings {
+            Headers = new Dictionary<string, string> {
+                { "x-api-key", apiKey }
+            },
+            RequestBody = System.Text.Encoding.UTF8.GetBytes(json)
+        });
+
+        Information(result);
     });
 
 Task("PushAppveyor")
@@ -186,15 +231,16 @@ Task("Test")
     .IsDependentOn("Init")
     .IsDependentOn("TestProject");
 
+Task("BuildDocumentation")
+    .IsDependentOn("Init")
+    .IsDependentOn("CompileDocumentation")
+    .IsDependentOn("CopyDocumentationTo-github.io-clone")
+    .IsDependentOn("UploadXrefMap");
+
 Task("PushPackage")
     .IsDependentOn("Init")
     .IsDependentOn("PushAppveyor")
     .IsDependentOn("PushNuget");
-
-Task("BuildDocumentation")
-    .IsDependentOn("Init")
-    .IsDependentOn("CompileDocumentation")
-    .IsDependentOn("CopyDocumentationTo-github.io-clone");
 
 Task("Default")
     .IsDependentOn("Build")
