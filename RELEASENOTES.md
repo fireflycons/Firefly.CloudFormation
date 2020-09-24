@@ -1,3 +1,7 @@
+# 0.2.3
+
+* Fix - Retrieving template for CREATE_FAILED SAM template stack throws exception
+
 # 0.2.2
 
 Add an additional Func parameter to DeleteStackAsync to give clients a way of asking "Do you want to delete the stack" from within the method, such that the correct object is returned.
