@@ -2,6 +2,7 @@
 {
     using System.Threading.Tasks;
 
+    using Amazon.CloudFormation;
     using Amazon.CloudFormation.Model;
 
     using Firefly.CloudFormation.Model;
@@ -82,8 +83,11 @@
             {
                 using (var cfn = this.ClientFactory.CreateCloudFormationClient())
                 {
-                    this.FileContent = (await cfn.GetTemplateAsync(new GetTemplateRequest { StackName = this.stackName }))
-                        .TemplateBody;
+                    this.FileContent = (await cfn.GetTemplateAsync(
+                                            new GetTemplateRequest
+                                                {
+                                                    StackName = this.stackName, TemplateStage = TemplateStage.Original
+                                                })).TemplateBody;
                     this.Source = InputFileSource.UsePreviousTemplate;
                 }
             }
