@@ -254,6 +254,11 @@
 
                         break;
 
+                    case "file":
+
+                        // If we get here then the file is not found, or it would have been picked up above.
+                        throw new FileNotFoundException("Template file does not exist", objectLocation);
+
                     default:
 
                         throw new ArgumentException($"Unsupported URI scheme '{uri.Scheme}");

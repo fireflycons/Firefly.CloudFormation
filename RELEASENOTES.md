@@ -1,3 +1,7 @@
+# 0.2.4
+
+Fix: Incorrect error message when a template file is not found: `ArgumentException` is thrown with message `Unsupported URI scheme 'file'` when it should be `FileNotFoundException`
+
 # 0.2.3
 
 * Fix - Retrieving template for CREATE_FAILED SAM template stack throws exception. Needed to 
