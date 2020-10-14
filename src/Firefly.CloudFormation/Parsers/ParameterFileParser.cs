@@ -16,7 +16,7 @@
     /// </para>
     /// </summary>
     /// <seealso cref="InputFileParser" />
-    public abstract class ParameterFileParser : InputFileParser
+    public abstract class ParameterFileParser : InputFileParser, IParameterFileParser
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ParameterFileParser"/> class.
@@ -33,7 +33,7 @@
         /// <param name="templateBody">The template body.</param>
         /// <returns>A new <see cref="ParameterFileParser"/></returns>
         /// <exception cref="InvalidDataException">Parameter file is empty is empty</exception>
-        public static ParameterFileParser CreateParser(string templateBody)
+        public static IParameterFileParser CreateParser(string templateBody)
         {
             // ReSharper disable once SwitchStatementHandlesSomeKnownEnumValuesWithDefault
             switch (InputFileParser.GetInputFileFormat(templateBody))

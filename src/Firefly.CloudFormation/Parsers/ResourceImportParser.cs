@@ -30,7 +30,7 @@
     /// </para>
     /// </summary>
     /// <seealso cref="InputFileParser" />
-    public abstract class ResourceImportParser : InputFileParser
+    public abstract class ResourceImportParser : InputFileParser, IResourceImportParser
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ResourceImportParser"/> class.
@@ -47,7 +47,7 @@
         /// <param name="fileContent">Content of the file.</param>
         /// <returns>A new <see cref="ResourceImportParser"/>.</returns>
         /// <exception cref="InvalidDataException">Resource import file is empty</exception>
-        public static ResourceImportParser Create(string fileContent)
+        public static IResourceImportParser Create(string fileContent)
         {
             // ReSharper disable once SwitchStatementHandlesSomeKnownEnumValuesWithDefault
             switch (InputFileParser.GetInputFileFormat(fileContent))

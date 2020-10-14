@@ -62,7 +62,7 @@
         /// <value>
         /// The resources.
         /// </value>
-        public IEnumerable<TemplateResource> Resources { get; private set; }
+        public IEnumerable<ITemplateResource> Resources { get; private set; }
 
         /// <summary>
         /// Gets the template description.

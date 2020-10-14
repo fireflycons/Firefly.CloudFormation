@@ -13,7 +13,7 @@
     /// Represents a resource stanza read from a template.
     /// A reference to the resource is included so that it can be directly modified.
     /// </summary>
-    public abstract class TemplateResource
+    public abstract class TemplateResource : ITemplateResource
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="TemplateResource"/> class.
@@ -129,7 +129,7 @@
         /// <param name="resourceType">Type of the resource.</param>
         /// <returns>Subclass of <see cref="TemplateResource"/> according to the type of <paramref name="rawResource"/></returns>
         /// <exception cref="InvalidDataException">Cannot parse CloudFormation resource from object of type {rawResource.GetType().FullName}</exception>
-        internal static TemplateResource Create(object rawResource, string logicalName, string resourceType)
+        internal static ITemplateResource Create(object rawResource, string logicalName, string resourceType)
         {
             switch (rawResource)
             {

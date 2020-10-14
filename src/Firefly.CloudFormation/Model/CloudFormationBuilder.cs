@@ -166,7 +166,7 @@ namespace Firefly.CloudFormation.Model
 
         /// <summary>Builds a new <see cref="CloudFormationRunner"/> with the settings applied thus far.</summary>
         /// <returns>A new <see cref="CloudFormationRunner"/></returns>
-        public CloudFormationRunner Build()
+        public ICloudFormationRunner Build()
         {
             return new CloudFormationRunner(
                 this._clientFactory ?? new DefaultClientFactory(this._cloudFormationContext),

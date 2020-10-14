@@ -14,7 +14,7 @@
     /// <summary>
     /// Base class for CloudFormation template parsers.
     /// </summary>
-    public abstract class TemplateParser : InputFileParser
+    public abstract class TemplateParser : InputFileParser, ITemplateParser
     {
         /// <summary>
         /// The description key name
@@ -56,7 +56,7 @@
         /// <param name="templateBody">The template body.</param>
         /// <returns>A new <see cref="TemplateParser"/></returns>
         /// <exception cref="InvalidDataException">Template body is empty</exception>
-        public static TemplateParser Create(string templateBody)
+        public static ITemplateParser Create(string templateBody)
         {
             // ReSharper disable once SwitchStatementHandlesSomeKnownEnumValuesWithDefault
             switch (InputFileParser.GetInputFileFormat(templateBody))
@@ -81,6 +81,7 @@
         /// <param name="objectGraph">The object graph.</param>
         /// <param name="format">The required serialization format.</param>
         /// <returns>Object graph serialized to string in requested format.</returns>
+        // ReSharper disable once UnusedMember.Global - Provided as an API method for clients of this module.
         public static string SerializeObjectGraphToString(object objectGraph, SerializationFormat format)
         {
             switch (format)
@@ -171,7 +172,7 @@
         /// Gets the template resources.
         /// </summary>
         /// <returns>Enumerable of resources found in template</returns>
-        public abstract IEnumerable<TemplateResource> GetResources();
+        public abstract IEnumerable<ITemplateResource> GetResources();
 
         /// <summary>
         /// Gets the template description.

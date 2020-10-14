@@ -57,9 +57,9 @@
 
         internal IEnumerable<string> YamlNestedStacks { get; }
 
-        internal IEnumerable<TemplateResource> JsonResources { get; }
+        internal IEnumerable<ITemplateResource> JsonResources { get; }
 
-        internal IEnumerable<TemplateResource> YamlResources { get; }
+        internal IEnumerable<ITemplateResource> YamlResources { get; }
 
         public void Dispose()
         {

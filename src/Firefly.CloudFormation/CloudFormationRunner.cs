@@ -30,7 +30,7 @@ namespace Firefly.CloudFormation
     /// To construct this object, get a builder instance by calling <see cref="CloudFormationRunner.Builder"/>
     /// </para>
     /// </summary>
-    public partial class CloudFormationRunner : IDisposable
+    public partial class CloudFormationRunner : ICloudFormationRunner
     {
         #region Fields
 

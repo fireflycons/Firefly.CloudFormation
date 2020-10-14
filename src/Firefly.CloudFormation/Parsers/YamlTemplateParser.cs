@@ -215,9 +215,9 @@
         /// <returns>
         /// Enumerable of resources found in template
         /// </returns>
-        public override IEnumerable<TemplateResource> GetResources()
+        public override IEnumerable<ITemplateResource> GetResources()
         {
-            var resources = new List<TemplateResource>();
+            var resources = new List<ITemplateResource>();
             var resourceBlock = (YamlMappingNode)this.rootNode.Children[this.propertyKeys[ResourceKeyName]];
 
             foreach (var resourceNode in resourceBlock.Children)

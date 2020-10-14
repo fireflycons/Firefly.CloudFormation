@@ -1,3 +1,7 @@
+# 0.2.5
+
+* Technical: Extract interfaces from CloudFormationRunner, ParameterFileParser, ResourceImportParser, TempateParser and TemplateResource to improve ability to mock in consuming projects.
+
 # 0.2.4
 
 Fix: Incorrect error message when a template file is not found: `ArgumentException` is thrown with message `Unsupported URI scheme 'file'` when it should be `FileNotFoundException`
