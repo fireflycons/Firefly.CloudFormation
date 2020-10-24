@@ -1,3 +1,7 @@
+# 0.3.0
+
+* Technical: Build against latest 3.5 AWSSDK
+
 # 0.2.5
 
 * Technical: Extract interfaces from CloudFormationRunner, ParameterFileParser, ResourceImportParser, TempateParser and TemplateResource to improve ability to mock in consuming projects.
