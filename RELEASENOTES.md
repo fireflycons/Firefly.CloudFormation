@@ -1,3 +1,7 @@
+# 0.3.1
+
+* Fix - Long delays when stack has a long event history. [Issue link](https://github.com/fireflycons/Firefly.CloudFormation/issues/4)
+
 # 0.3.0
 
 * Technical: Build against latest 3.5 AWSSDK

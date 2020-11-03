@@ -40,24 +40,13 @@
         /// <returns>Timestamp of most recent event</returns>
         private async Task<DateTime> GetMostRecentStackEvent(string stackId)
         {
-            string nextToken = null;
-            var allEvents = new List<StackEvent>();
+            // CF returns events in descending chronological order
+            var response = await PollyHelper.ExecuteWithPolly(
+                               () => this.client.DescribeStackEventsAsync(
+                                   new DescribeStackEventsRequest { StackName = stackId }));
 
-            // Get events for this stack
-            do
-            {
-                var token = nextToken;
-                var response = await PollyHelper.ExecuteWithPolly(
-                                   () => this.client.DescribeStackEventsAsync(
-                                       new DescribeStackEventsRequest { StackName = stackId, NextToken = token }));
-
-                nextToken = response.NextToken;
-                allEvents.AddRange(response.StackEvents);
-            }
-            while (nextToken != null);
-
-            return allEvents.Any()
-                       ? allEvents.OrderByDescending(e => e.Timestamp).First().Timestamp
+            return response.StackEvents.Any()
+                       ? response.StackEvents.First().Timestamp
                        : DateTime.MinValue;
         }
 
@@ -200,16 +189,22 @@
                 // Get events for this stack
                 do
                 {
-                    var token = nextToken;
                     var response = await PollyHelper.ExecuteWithPolly(
                                        () => this.client.DescribeStackEventsAsync(
                                            new DescribeStackEventsRequest
                                                {
-                                                   StackName = stackArnLocal, NextToken = token
+                                                   // ReSharper disable once AccessToModifiedClosure
+                                                   StackName = stackArnLocal, NextToken = nextToken
                                                }));
 
                     nextToken = response.NextToken;
                     allEvents.AddRange(response.StackEvents.Where(e => e.Timestamp > this.lastEventTime));
+
+                    if (response.StackEvents.Any() && response.StackEvents.Last().Timestamp <= this.lastEventTime)
+                    {
+                        // Break here as remaining events will be older.
+                        nextToken = null;
+                    }
                 }
                 while (nextToken != null);
 
