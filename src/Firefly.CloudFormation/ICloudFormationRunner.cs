@@ -51,8 +51,5 @@
         /// <exception cref="StackOperationException">Change set creation failed for reasons other than 'no change'</exception>
         /// <returns>Operation result.</returns>
         Task<CloudFormationResult> UpdateStackAsync(Func<DescribeChangeSetResponse, bool> confirmationFunc);
-
-        /// <summary>Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.</summary>
-        void Dispose();
     }
 }
