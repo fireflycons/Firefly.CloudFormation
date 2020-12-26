@@ -416,7 +416,8 @@ namespace Firefly.CloudFormation
             var haveRetainResources = this.retainResource != null && this.retainResource.Any();
 
             // Only permit delete if stack is in Ready state
-            if (operationalState != StackOperationalState.Ready && operationalState != StackOperationalState.DeleteFailed)
+            if (!new[] { StackOperationalState.Ready, StackOperationalState.DeleteFailed, StackOperationalState.Broken }
+                    .Contains(operationalState))
             {
                 throw new StackOperationException(stack, operationalState);
             }
@@ -441,6 +442,11 @@ namespace Firefly.CloudFormation
                 }
 
                 this.retainResource = null;
+            }
+
+            if (operationalState == StackOperationalState.Broken)
+            {
+                this.context.Logger.LogWarning("Stack is in a failed state from previous operation. Delete may fail.");
             }
 
             // Resolve template from CloudFormation to get description if any
@@ -547,10 +553,14 @@ namespace Firefly.CloudFormation
             switch (operationalState)
             {
                 case StackOperationalState.Deleting:
-                case StackOperationalState.Broken:
                 case StackOperationalState.DeleteFailed:
 
                     throw new StackOperationException(stack, operationalState);
+
+                case StackOperationalState.Broken:
+
+                    this.context.Logger.LogWarning("Stack is in a failed state from previous operation. Update may fail.");
+                    break;
 
                 case StackOperationalState.Busy:
 

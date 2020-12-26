@@ -197,10 +197,6 @@
         /// <param name="stackStatus">The stack status.</param>
         /// <param name="expectedOutcome">Expected outcome</param>
         [Theory]
-        [InlineData("CREATE_FAILED", StackOperationalState.Broken)]
-        [InlineData("IMPORT_ROLLBACK_FAILED", StackOperationalState.Broken)]
-        [InlineData("ROLLBACK_FAILED", StackOperationalState.Broken)]
-        [InlineData("UPDATE_ROLLBACK_FAILED", StackOperationalState.Broken)]
         [InlineData("CREATE_IN_PROGRESS", StackOperationalState.Busy)]
         [InlineData("IMPORT_IN_PROGRESS", StackOperationalState.Busy)]
         [InlineData("IMPORT_ROLLBACK_IN_PROGRESS", StackOperationalState.Busy)]

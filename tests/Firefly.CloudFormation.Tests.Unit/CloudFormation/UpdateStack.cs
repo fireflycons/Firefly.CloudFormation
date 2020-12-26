@@ -311,11 +311,7 @@
         /// <param name="stackStatus">The stack status.</param>
         /// <param name="expectedOutcome">Expected outcome</param>
         [Theory]
-        [InlineData("CREATE_FAILED", StackOperationalState.Broken)]
         [InlineData("DELETE_FAILED", StackOperationalState.DeleteFailed)]
-        [InlineData("IMPORT_ROLLBACK_FAILED", StackOperationalState.Broken)]
-        [InlineData("ROLLBACK_FAILED", StackOperationalState.Broken)]
-        [InlineData("UPDATE_ROLLBACK_FAILED", StackOperationalState.Broken)]
         public void ShouldFailIfStackIsBroken(string stackStatus, StackOperationalState expectedOutcome)
         {
             var logger = new TestLogger(this.output);

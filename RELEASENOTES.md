@@ -1,3 +1,7 @@
+# 0.3.2
+
+* Fix - Should not abort operation for "Broken" state. [Issue link](https://github.com/fireflycons/Firefly.CloudFormation/issues/5), for [this PSCloudFormation issue](https://github.com/fireflycons/PSCloudFormation/issues/88)
+
 # 0.3.1
 
 * Fix - Long delays when stack has a long event history. [Issue link](https://github.com/fireflycons/Firefly.CloudFormation/issues/4)
