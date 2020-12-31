@@ -1,3 +1,8 @@
+# 0.4.0
+
+* Enhancement - Add support for IncludeNestedChangesets. [Issue link](https://github.com/fireflycons/Firefly.CloudFormation/issues/6)
+* Technical - Update AWSSDK.CloudFormation dependency.
+
 # 0.3.2
 
 * Fix - Should not abort operation for "Broken" state. [Issue link](https://github.com/fireflycons/Firefly.CloudFormation/issues/5), for [this PSCloudFormation issue](https://github.com/fireflycons/PSCloudFormation/issues/88)
