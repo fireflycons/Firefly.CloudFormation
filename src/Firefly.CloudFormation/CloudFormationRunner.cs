@@ -157,6 +157,16 @@ namespace Firefly.CloudFormation
         private readonly bool waitForInProgressUpdate;
 
         /// <summary>
+        /// Whether to force use of S3
+        /// </summary>
+        private readonly bool forceS3;
+
+        /// <summary>
+        /// Whether to include nested stacks in changesets
+        /// </summary>
+        private readonly bool includeNestedStacks;
+
+        /// <summary>
         /// The retain resource
         /// </summary>
         private List<string> retainResource;
@@ -176,8 +186,6 @@ namespace Firefly.CloudFormation
 
         /// <summary>Whether to follow an in-progress operation.</summary>
         private bool followOperation;
-
-        private readonly bool forceS3;
 
         #endregion
 
@@ -210,6 +218,7 @@ namespace Firefly.CloudFormation
         /// <param name="disableRollback">Set to <c>true</c> to disable rollback of the stack if stack creation failed.</param>
         /// <param name="retainResource">For stacks in the DELETE_FAILED state, a list of resource logical IDs that are associated with the resources you want to retain.</param>
         /// <param name="forceS3">If <c>true</c> always upload local templates to S3.</param>
+        /// <param name="includeNestedStacks">Creates a change set for the all nested stacks specified in the template. The default behavior of this action is set to <c>false</c>. To include nested sets in a change set, specify <c>true</c>.</param>
         /// <remarks>Constructor is private as this class implements the builder pattern. See CloudFormation.Runner.Builder.cs</remarks>
         internal CloudFormationRunner(
             IAwsClientFactory clientFactory,
@@ -238,8 +247,10 @@ namespace Firefly.CloudFormation
             int timeoutInMinutes,
             bool disableRollback,
             List<string> retainResource,
-            bool forceS3)
+            bool forceS3,
+            bool includeNestedStacks)
         {
+            this.includeNestedStacks = includeNestedStacks;
             this.forceS3 = forceS3;
             this.retainResource = retainResource;
             this.disableRollback = disableRollback;
@@ -614,7 +625,8 @@ namespace Firefly.CloudFormation
                                            TemplateBody = this.templateResolver.ArtifactContent,
                                            TemplateURL =
                                                this.usePreviousTemplate ? null : this.templateResolver.ArtifactUrl,
-                                           UsePreviousTemplate = this.usePreviousTemplate
+                                           UsePreviousTemplate = this.usePreviousTemplate,
+                                           IncludeNestedStacks = this.includeNestedStacks
                                        };
 
             this.context.Logger.LogInformation($"Creating changeset {changeSetName} for {this.GetStackNameWithDescription()}");
