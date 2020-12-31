@@ -40,6 +40,9 @@ namespace Firefly.CloudFormation.Model
         /// <summary>The stack name</summary>
         private readonly string _stackName;
 
+        /// <summary>The stack capabilities</summary>
+        private IEnumerable<Capability> _capabilities = new List<Capability>();
+
         /// <summary>
         /// Whether to only create change set.
         /// </summary>
@@ -59,9 +62,22 @@ namespace Firefly.CloudFormation.Model
         private bool _deleteNoopChangeset = true;
 
         /// <summary>
-        /// Resource Imports
+        /// The disable rollback
         /// </summary>
-        private string _resourceImportsLocation;
+        private bool _disableRollback;
+
+        /// <summary>Whether to wait for an operation to complete</summary>
+        private bool _followOperation;
+
+        /// <summary>
+        /// Whether to force upload of local template 
+        /// </summary>
+        private bool _forceS3;
+
+        /// <summary>
+        /// Whether to include nested stacks in changesets
+        /// </summary>
+        private bool _includeNestedStacks;
 
         /// <summary>
         /// The notification ARNs
@@ -69,29 +85,22 @@ namespace Firefly.CloudFormation.Model
         private List<string> _notificationARNs = new List<string>();
 
         /// <summary>
-        /// The role ARN
+        /// The on failure action
         /// </summary>
-        private string _roleARN;
-
-        /// <summary>The stack capabilities</summary>
-        private IEnumerable<Capability> _capabilities = new List<Capability>();
+        private OnFailure _onFailure;
 
         /// <summary>The stack parameters</summary>
         private IDictionary<string, string> _parameters;
 
-        /// <summary>The tagging information</summary>
-        private List<Tag> _tags = new List<Tag>();
-
-        /// <summary>The template location. Either path o URL</summary>
-        private string _templateLocation;
-
-        /// <summary>Whether to wait for an operation to complete</summary>
-        private bool _followOperation;
+        /// <summary>
+        /// Resource Imports
+        /// </summary>
+        private string _resourceImportsLocation;
 
         /// <summary>
-        /// <c>true</c> to use previous template for updates.
+        /// The resources to retain on stack delete.
         /// </summary>
-        private bool _usePreviousTemplate;
+        private List<string> _resourcesToRetain;
 
         /// <summary>
         /// The template resource types that you have permissions to work with for this action.
@@ -99,14 +108,14 @@ namespace Firefly.CloudFormation.Model
         private List<string> _resourceTypes = new List<string>();
 
         /// <summary>
+        /// The role ARN
+        /// </summary>
+        private string _roleARN;
+
+        /// <summary>
         /// The rollback configuration
         /// </summary>
         private RollbackConfiguration _rollbackConfiguration;
-
-        /// <summary>
-        /// The termination protection
-        /// </summary>
-        private bool _terminationProtection;
 
         /// <summary>
         /// The stack policy
@@ -118,10 +127,16 @@ namespace Firefly.CloudFormation.Model
         /// </summary>
         private string _stackPolicyDuringUpdate;
 
+        /// <summary>The tagging information</summary>
+        private List<Tag> _tags = new List<Tag>();
+
+        /// <summary>The template location. Either path o URL</summary>
+        private string _templateLocation;
+
         /// <summary>
-        /// The on failure action
+        /// The termination protection
         /// </summary>
-        private OnFailure _onFailure;
+        private bool _terminationProtection;
 
         /// <summary>
         /// The timeout in minutes
@@ -129,24 +144,14 @@ namespace Firefly.CloudFormation.Model
         private int _timeoutInMinutes;
 
         /// <summary>
-        /// The disable rollback
+        /// <c>true</c> to use previous template for updates.
         /// </summary>
-        private bool _disableRollback;
-
-        /// <summary>
-        /// The resources to retain on stack delete.
-        /// </summary>
-        private List<string> _resourcesToRetain;
+        private bool _usePreviousTemplate;
 
         /// <summary>
         /// The wait for in progress update
         /// </summary>
         private bool _waitForInProgressUpdate;
-
-        /// <summary>
-        /// Whether to force upload of local template 
-        /// </summary>
-        private bool _forceS3;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CloudFormationBuilder"/> class.
@@ -194,7 +199,8 @@ namespace Firefly.CloudFormation.Model
                 this._timeoutInMinutes,
                 this._disableRollback,
                 this._resourcesToRetain,
-                this._forceS3);
+                this._forceS3,
+                this._includeNestedStacks);
         }
 
         /// <summary>In some cases, you must explicitly acknowledge that your stack template contains certain capabilities in order for AWS CloudFormation to create the stack.
@@ -257,6 +263,41 @@ namespace Firefly.CloudFormation.Model
         }
 
         /// <summary>
+        /// Disables rollback on create failure, leaving the successfully created resources intact.
+        /// </summary>
+        /// <returns>The builder</returns>
+        /// <param name="enable">If <c>true</c> (default), disable rollback if stack create fails.</param>
+        /// <exception cref="ArgumentException">Cannot set DisableRollback when OnFailure has been set</exception>
+        public CloudFormationBuilder WithDisableRollback(bool enable)
+        {
+            this._disableRollback = enable;
+
+            if (this._disableRollback && this._onFailure != null)
+            {
+                throw new ArgumentException("Cannot set DisableRollback when OnFailure has been set");
+            }
+
+            return this;
+        }
+
+        /// <summary>
+        /// <para>
+        /// Sets whether to follow a stack operation.
+        /// </para>
+        /// <para>
+        /// For all stack modifications, if this is set then the method will not return until the stack operation completes,
+        /// sending events to the <see cref="ILogger"/> implementation.
+        /// </para>
+        /// </summary>
+        /// <param name="enable">If <c>true</c> (default), wait for stack action to complete.</param>
+        /// <returns>The builder</returns>
+        public CloudFormationBuilder WithFollowOperation(bool enable = true)
+        {
+            this._followOperation = enable;
+            return this;
+        }
+
+        /// <summary>
         /// Set whether to force upload of local template to S3, even if it is less than the maximum size for local templates.
         /// </summary>
         /// <param name="force">if set to <c>true</c>, always upload the template.</param>
@@ -272,6 +313,17 @@ namespace Firefly.CloudFormation.Model
         }
 
         /// <summary>
+        /// Creates a change set for the all nested stacks specified in the template. The default behavior of this action is set to False. To include nested sets in a change set, specify True.
+        /// </summary>
+        /// <param name="include">if set to <c>true</c> [include].</param>
+        /// <returns>The builder</returns>
+        public CloudFormationBuilder WithIncludeNestedStacks(bool include = false)
+        {
+            this._includeNestedStacks = include;
+            return this;
+        }
+
+        /// <summary>
         /// The Amazon Resource Names (ARNs) of Amazon Simple Notification Service (Amazon SNS) topics that AWS CloudFormation associates with the stack.
         /// To remove all associated notification topics, specify an empty list.
         /// </summary>
@@ -280,6 +332,23 @@ namespace Firefly.CloudFormation.Model
         public CloudFormationBuilder WithNotificationARNs(IEnumerable<string> notificationARNs)
         {
             this._notificationARNs = notificationARNs == null ? new List<string>() : notificationARNs.ToList();
+            return this;
+        }
+
+        /// <summary>
+        /// Determines what action will be taken if stack creation fails.
+        /// </summary>
+        /// <param name="onFailure">The action to take on create failure.</param>
+        /// <returns>The builder</returns>
+        /// <exception cref="ArgumentException">Cannot set OnFailure when DisableRollback is true</exception>
+        public CloudFormationBuilder WithOnFailure(OnFailure onFailure)
+        {
+            if (this._disableRollback)
+            {
+                throw new ArgumentException("Cannot set OnFailure when DisableRollback is true");
+            }
+
+            this._onFailure = onFailure;
             return this;
         }
 
@@ -305,6 +374,28 @@ namespace Firefly.CloudFormation.Model
         }
 
         /// <summary>
+        /// Sets the template resource types that you have permissions to work with for this update stack action.
+        /// </summary>
+        /// <param name="resourceType">Type of the resource.</param>
+        /// <returns>The builder</returns>
+        public CloudFormationBuilder WithResourceType(IEnumerable<string> resourceType)
+        {
+            this._resourceTypes = resourceType?.ToList();
+            return this;
+        }
+
+        /// <summary>
+        /// For stacks in the <c>DELETE_FAILED</c> state, a list of resource logical IDs that are associated with the resources you want to retain.
+        /// </summary>
+        /// <param name="retainResource">The resources to retain.</param>
+        /// <returns>The builder</returns>
+        public CloudFormationBuilder WithRetainResource(IEnumerable<string> retainResource)
+        {
+            this._resourcesToRetain = retainResource?.ToList();
+            return this;
+        }
+
+        /// <summary>
         /// The Amazon Resource Name (ARN) of an AWS Identity and Access Management (IAM) role that AWS CloudFormation assumes when executing the change set.
         /// AWS CloudFormation uses the role's credentials to make calls on your behalf. AWS CloudFormation uses this role for all future operations on the stack.
         /// As long as users have permission to operate on the stack, AWS CloudFormation uses this role even if the users don't have permission to pass it. Ensure that the role grants least privilege.
@@ -316,72 +407,6 @@ namespace Firefly.CloudFormation.Model
         public CloudFormationBuilder WithRoleArn(string arn)
         {
             this._roleARN = arn;
-            return this;
-        }
-
-        /// <summary>Adds stack-level tags which are applied to the stack itself and all resources created.</summary>
-        /// <param name="tags">The tags.</param>
-        /// <returns>The builder</returns>
-        public CloudFormationBuilder WithTags(IEnumerable<Tag> tags)
-        {
-            this._tags = tags == null ? new List<Tag>() : tags.ToList();
-            return this;
-        }
-
-        /// <summary>Adds the template location. Either a local path, or an HTTPS or S3 URI pointing to a template in S3.</summary>
-        /// <param name="templateLocation">The template location.</param>
-        /// <returns>The builder</returns>
-        public CloudFormationBuilder WithTemplateLocation(string templateLocation)
-        {
-            this._templateLocation = templateLocation;
-            return this;
-        }
-
-        /// <summary>
-        /// <para>
-        /// Sets whether to follow a stack operation.
-        /// </para>
-        /// <para>
-        /// For all stack modifications, if this is set then the method will not return until the stack operation completes,
-        /// sending events to the <see cref="ILogger"/> implementation.
-        /// </para>
-        /// </summary>
-        /// <param name="enable">If <c>true</c> (default), wait for stack action to complete.</param>
-        /// <returns>The builder</returns>
-        public CloudFormationBuilder WithFollowOperation(bool enable = true)
-        {
-            this._followOperation = enable;
-            return this;
-        }
-
-        /// <summary>
-        /// <para>
-        /// Sets whether to wait for another operation on this stack which is in progress.
-        /// </para>
-        /// <para>
-        /// For stack updates, should a modification be in progress at the time <see cref="CloudFormationRunner.UpdateStackAsync"/> is called,
-        /// then that method will wait for the modification to complete, sending events to the <see cref="ILogger"/> interface prior to creating the update changeset.
-        /// </para>
-        /// </summary>
-        /// <param name="enable">
-        /// If <c>true</c> (default), wait for stack action initiated elsewhere to complete,
-        /// logging stack events to the given <see cref="ILogger"/> implementation.
-        /// </param>
-        /// <returns>The builder</returns>
-        public CloudFormationBuilder WithWaitForInProgressUpdate(bool enable = true)
-        {
-            this._waitForInProgressUpdate = enable;
-            return this;
-        }
-
-        /// <summary>
-        /// Whether to use existing template for stack update.
-        /// </summary>
-        /// <param name="enable">If <c>true</c> (default), use the previous template stored in CloudFormation to perform an update.</param>
-        /// <returns>The builder</returns>
-        public CloudFormationBuilder WithUsePreviousTemplate(bool enable = true)
-        {
-            this._usePreviousTemplate = enable;
             return this;
         }
 
@@ -421,14 +446,21 @@ namespace Firefly.CloudFormation.Model
             return this;
         }
 
-        /// <summary>
-        /// Sets the template resource types that you have permissions to work with for this update stack action.
-        /// </summary>
-        /// <param name="resourceType">Type of the resource.</param>
+        /// <summary>Adds stack-level tags which are applied to the stack itself and all resources created.</summary>
+        /// <param name="tags">The tags.</param>
         /// <returns>The builder</returns>
-        public CloudFormationBuilder WithResourceType(IEnumerable<string> resourceType)
+        public CloudFormationBuilder WithTags(IEnumerable<Tag> tags)
         {
-            this._resourceTypes = resourceType?.ToList();
+            this._tags = tags == null ? new List<Tag>() : tags.ToList();
+            return this;
+        }
+
+        /// <summary>Adds the template location. Either a local path, or an HTTPS or S3 URI pointing to a template in S3.</summary>
+        /// <param name="templateLocation">The template location.</param>
+        /// <returns>The builder</returns>
+        public CloudFormationBuilder WithTemplateLocation(string templateLocation)
+        {
+            this._templateLocation = templateLocation;
             return this;
         }
 
@@ -444,23 +476,6 @@ namespace Firefly.CloudFormation.Model
         }
 
         /// <summary>
-        /// Determines what action will be taken if stack creation fails.
-        /// </summary>
-        /// <param name="onFailure">The action to take on create failure.</param>
-        /// <returns>The builder</returns>
-        /// <exception cref="ArgumentException">Cannot set OnFailure when DisableRollback is true</exception>
-        public CloudFormationBuilder WithOnFailure(OnFailure onFailure)
-        {
-            if (this._disableRollback)
-            {
-                throw new ArgumentException("Cannot set OnFailure when DisableRollback is true");
-            }
-
-            this._onFailure = onFailure;
-            return this;
-        }
-
-        /// <summary>
         /// The amount of time that can pass before the stack status becomes CREATE_FAILED (Create only)
         /// </summary>
         /// <param name="timeout">The timeout.</param>
@@ -472,31 +487,33 @@ namespace Firefly.CloudFormation.Model
         }
 
         /// <summary>
-        /// Disables rollback on create failure, leaving the successfully created resources intact.
+        /// Whether to use existing template for stack update.
         /// </summary>
+        /// <param name="enable">If <c>true</c> (default), use the previous template stored in CloudFormation to perform an update.</param>
         /// <returns>The builder</returns>
-        /// <param name="enable">If <c>true</c> (default), disable rollback if stack create fails.</param>
-        /// <exception cref="ArgumentException">Cannot set DisableRollback when OnFailure has been set</exception>
-        public CloudFormationBuilder WithDisableRollback(bool enable)
+        public CloudFormationBuilder WithUsePreviousTemplate(bool enable = true)
         {
-            this._disableRollback = enable;
-
-            if (this._disableRollback && this._onFailure != null)
-            {
-                throw new ArgumentException("Cannot set DisableRollback when OnFailure has been set");
-            }
-
+            this._usePreviousTemplate = enable;
             return this;
         }
 
         /// <summary>
-        /// For stacks in the <c>DELETE_FAILED</c> state, a list of resource logical IDs that are associated with the resources you want to retain.
+        /// <para>
+        /// Sets whether to wait for another operation on this stack which is in progress.
+        /// </para>
+        /// <para>
+        /// For stack updates, should a modification be in progress at the time <see cref="CloudFormationRunner.UpdateStackAsync"/> is called,
+        /// then that method will wait for the modification to complete, sending events to the <see cref="ILogger"/> interface prior to creating the update changeset.
+        /// </para>
         /// </summary>
-        /// <param name="retainResource">The resources to retain.</param>
+        /// <param name="enable">
+        /// If <c>true</c> (default), wait for stack action initiated elsewhere to complete,
+        /// logging stack events to the given <see cref="ILogger"/> implementation.
+        /// </param>
         /// <returns>The builder</returns>
-        public CloudFormationBuilder WithRetainResource(IEnumerable<string> retainResource)
+        public CloudFormationBuilder WithWaitForInProgressUpdate(bool enable = true)
         {
-            this._resourcesToRetain = retainResource?.ToList();
+            this._waitForInProgressUpdate = enable;
             return this;
         }
     }
