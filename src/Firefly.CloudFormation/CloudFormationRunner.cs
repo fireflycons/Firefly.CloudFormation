@@ -631,6 +631,11 @@ namespace Firefly.CloudFormation
 
             this.context.Logger.LogInformation($"Creating changeset {changeSetName} for {this.GetStackNameWithDescription()}");
 
+            if (this.includeNestedStacks)
+            {
+                this.context.Logger.LogInformation("IncludeNestedChangesets is enabled. This may take some time...");
+            }
+
             var changesetArn = (await this.client.CreateChangeSetAsync(changeSetRequest)).Id;
 
             var stat = ChangeSetStatus.CREATE_PENDING;
@@ -674,7 +679,19 @@ namespace Firefly.CloudFormation
 
             // If we get here, emit details, then apply the changeset.
             // ReSharper disable once PossibleNullReferenceException - we will go round the above loop at least once
-            this.context.Logger.LogChangeset(response);
+            if (this.includeNestedStacks)
+            {
+                // Base stack
+                this.context.Logger.LogInformation($"Root Stack: {this.stackName}");
+                this.context.Logger.LogChangeset(response);
+
+                // Walk all nested stacks and emit changes for each
+                await EmitNestedStackChangesets(response);
+            }
+            else
+            {
+                this.context.Logger.LogChangeset(response);
+            }
 
             if (this.changesetOnly)
             {
@@ -740,6 +757,33 @@ namespace Firefly.CloudFormation
                            StackArn = stack.StackId,
                            StackOperationResult = StackOperationResult.StackUpdateInProgress
                        };
+
+            async Task EmitNestedStackChangesets(DescribeChangeSetResponse parentChangeSetResponse)
+            {
+                // Recursively discover nested stacks and emit changesets for each
+                foreach (var nested in parentChangeSetResponse.Changes.Where(
+                    c => c.ResourceChange.ResourceType == "AWS::CloudFormation::Stack"))
+                {
+                    // Locate nested stack's changeset. It's parent ID will be set to the ID in parentChangeSetResponse
+                    var summary = (await this.client.ListChangeSetsAsync(
+                                       new ListChangeSetsRequest
+                                           {
+                                               StackName = nested.ResourceChange.PhysicalResourceId
+                                           })).Summaries.First(
+                        s => s.ParentChangeSetId == parentChangeSetResponse.ChangeSetId);
+
+                    var nestedResponse = await this.client.DescribeChangeSetAsync(
+                                       new DescribeChangeSetRequest
+                                           {
+                                               ChangeSetName = summary.ChangeSetName,
+                                               StackName = nested.ResourceChange.PhysicalResourceId
+                                           });
+
+                    this.context.Logger.LogInformation($"Nested Stack: {nested.ResourceChange.LogicalResourceId}");
+                    this.context.Logger.LogChangeset(nestedResponse);
+                    await EmitNestedStackChangesets(nestedResponse);
+                }
+            }
         }
     }
 }
