@@ -1,3 +1,7 @@
+# 1.0.0
+
+* BREAKING CHANGE- Enhancement - Add new property `ChangesetResponse` to `CloudFormationResult` type returned by methods of `CloudFormationRunner`. This property is populated where a changeset was created and not later deleted by the stack operation. [Issue link](https://github.com/fireflycons/Firefly.CloudFormation/issues/8)
+
 # 0.4.0
 
 * Enhancement - Add support for IncludeNestedChangesets. [Issue link](https://github.com/fireflycons/Firefly.CloudFormation/issues/6)

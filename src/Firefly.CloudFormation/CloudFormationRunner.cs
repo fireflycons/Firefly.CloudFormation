@@ -641,19 +641,19 @@ namespace Firefly.CloudFormation
             var stat = ChangeSetStatus.CREATE_PENDING;
             var describeChangeSetRequest = new DescribeChangeSetRequest { ChangeSetName = changesetArn };
 
-            DescribeChangeSetResponse response = null;
+            DescribeChangeSetResponse describeChangeSetResponse = null;
 
             while (!(stat == ChangeSetStatus.CREATE_COMPLETE || stat == ChangeSetStatus.FAILED))
             {
                 Thread.Sleep(this.waitPollTime / 2);
-                response = await this.client.DescribeChangeSetAsync(describeChangeSetRequest);
-                stat = response.Status;
+                describeChangeSetResponse = await this.client.DescribeChangeSetAsync(describeChangeSetRequest);
+                stat = describeChangeSetResponse.Status;
             }
 
             if (stat == ChangeSetStatus.FAILED)
             {
                 // ReSharper disable once PossibleNullReferenceException - we will go round the above loop at least once
-                var reason = response.StatusReason;
+                var reason = describeChangeSetResponse.StatusReason;
 
                 if (!NoChangeMessages.Any(msg => reason.StartsWith(msg)))
                 {
@@ -672,6 +672,7 @@ namespace Firefly.CloudFormation
 
                 return new CloudFormationResult
                            {
+                               ChangesetResponse = this.deleteNoopChangeSet ? null : describeChangeSetResponse,
                                StackArn = stack.StackId,
                                StackOperationResult = StackOperationResult.NoChange
                            };
@@ -683,24 +684,25 @@ namespace Firefly.CloudFormation
             {
                 // Base stack
                 this.context.Logger.LogInformation($"Root Stack: {this.stackName}");
-                this.context.Logger.LogChangeset(response);
+                this.context.Logger.LogChangeset(describeChangeSetResponse);
 
                 // Walk all nested stacks and emit changes for each
-                await EmitNestedStackChangesets(response);
+                await EmitNestedStackChangesets(describeChangeSetResponse);
             }
             else
             {
-                this.context.Logger.LogChangeset(response);
+                this.context.Logger.LogChangeset(describeChangeSetResponse);
             }
 
             if (this.changesetOnly)
             {
                 this.context.Logger.LogInformation(
                     // ReSharper disable once PossibleNullReferenceException - 'response' cannot be null. DescribeChangeSetAsync has been called at least once to make it here.
-                    $"Changeset {response.ChangeSetName} created for stack {stack.StackName}");
+                    $"Changeset {describeChangeSetResponse.ChangeSetName} created for stack {stack.StackName}");
                 this.context.Logger.LogInformation("Not updating stack since CreateChangesetOnly = true");
                 return new CloudFormationResult
                            {
+                               ChangesetResponse = describeChangeSetResponse,
                                StackArn = stack.StackId,
                                StackOperationResult = StackOperationResult.NoChange
                            };
@@ -709,10 +711,11 @@ namespace Firefly.CloudFormation
             if (confirmationFunc != null)
             {
                 // Confirm the changeset before proceeding
-                if (!confirmationFunc(response))
+                if (!confirmationFunc(describeChangeSetResponse))
                 {
                     return new CloudFormationResult
                                {
+                                   ChangesetResponse = describeChangeSetResponse,
                                    StackArn = stack.StackId,
                                    StackOperationResult = StackOperationResult.NoChange
                                };
@@ -747,6 +750,7 @@ namespace Firefly.CloudFormation
                 await this.WaitStackOperationAsync(stack.StackId, true);
                 return new CloudFormationResult
                            {
+                               ChangesetResponse = describeChangeSetResponse,
                                StackArn = stack.StackId,
                                StackOperationResult = StackOperationResult.StackUpdated
                            };
@@ -754,6 +758,7 @@ namespace Firefly.CloudFormation
 
             return new CloudFormationResult
                        {
+                           ChangesetResponse = describeChangeSetResponse,
                            StackArn = stack.StackId,
                            StackOperationResult = StackOperationResult.StackUpdateInProgress
                        };
