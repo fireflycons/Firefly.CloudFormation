@@ -1,5 +1,5 @@
 #addin nuget:?package=Newtonsoft.Json&version=12.0.3
-#addin nuget:?package=Cake.Http&version=0.7.0
+#addin nuget:?package=Cake.Http&version=1.2.2
 
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -41,7 +41,7 @@ Task("Init")
 
         buildVersion = GetBuildVersion();
 
-        foreach(var projectFile in GetFiles(projectRoot + File("**/*.csproj")))
+        foreach(var projectFile in GetFiles(new GlobPattern(projectRoot + File("**/*.csproj"))))
         {
             var project = XElement.Load(projectFile.ToString());
 
@@ -108,7 +108,7 @@ Task("TestProject")
             {
                 Configuration = configuration,
                 NoBuild = true,
-                Logger = "trx",
+                Loggers = new [] { "trx" },
                 ResultsDirectory = testResultsDir
             });
         }
@@ -216,9 +216,12 @@ Task("PushNuget")
     .Does(() => {
 
         // Set env var NUGET_ENDPOINT to publish to a feed other than nuget.org
-        NuGetPush(nugetPackagePath, new NuGetPushSettings {
+        // According to NuGet documentation, a .snupkg in the same directory should also be pushed.
+        NuGetPush(nugetPackagePath.GetFilename(), new NuGetPushSettings {
                 Source = EnvironmentVariable<string>("NUGET_ENDPOINT", "https://api.nuget.org/v3/index.json"),
-                ApiKey = EnvironmentVariable("NUGET_API_KEY")
+                ApiKey = EnvironmentVariable("NUGET_API_KEY"),
+                WorkingDirectory = nugetPackagePath.GetDirectory(),
+                Verbosity = NuGetVerbosity.Detailed
             });
     });
 
@@ -374,7 +377,7 @@ void UploadTestResults()
 
     using (var wc = new WebClient())
     {
-        foreach(var result in GetFiles(testResultsDir + File("*.trx")))
+        foreach(var result in GetFiles(new GlobPattern(testResultsDir + File("*.trx"))))
         {
             wc.UploadFile($"https://ci.appveyor.com/api/testresults/mstest/{EnvironmentVariableStrict("APPVEYOR_JOB_ID")}", result.ToString());
         }
