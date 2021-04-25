@@ -1,3 +1,6 @@
+# 1.0.1
+
+* Enhancement - Add [SourceLink](https://github.com/dotnet/sourcelink/blob/main/README.md) support. [Issue link](https://github.com/fireflycons/Firefly.CloudFormation/issues/9)
 # 1.0.0
 
 * BREAKING CHANGE- Enhancement - Add new property `ChangesetResponse` to `CloudFormationResult` type returned by methods of `CloudFormationRunner`. This property is populated where a changeset was created and not later deleted by the stack operation. [Issue link](https://github.com/fireflycons/Firefly.CloudFormation/issues/8)
