@@ -1,3 +1,11 @@
+# 1.0.3
+
+* Fix - Incorrect handling of DisableRollback parameter. [Issue link](https://github.com/fireflycons/Firefly.CloudFormation/issues/12)
+
+# 1.0.2
+
+* Enhancement - Add additional width to logical ID column when serverless resources are present.
+
 # 1.0.1
 
 * Enhancement - Add [SourceLink](https://github.com/dotnet/sourcelink/blob/main/README.md) support. [Issue link](https://github.com/fireflycons/Firefly.CloudFormation/issues/9)

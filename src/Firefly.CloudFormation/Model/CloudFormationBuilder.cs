@@ -343,7 +343,7 @@ namespace Firefly.CloudFormation.Model
         /// <exception cref="ArgumentException">Cannot set OnFailure when DisableRollback is true</exception>
         public CloudFormationBuilder WithOnFailure(OnFailure onFailure)
         {
-            if (this._disableRollback)
+            if (this._disableRollback && onFailure != null)
             {
                 throw new ArgumentException("Cannot set OnFailure when DisableRollback is true");
             }
