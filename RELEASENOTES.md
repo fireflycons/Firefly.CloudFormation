@@ -1,3 +1,7 @@
+# 1.0.4
+
+* Improvement - S3 Access Denied when using UsePreviousTemplate. [Issue link](https://github.com/fireflycons/Firefly.CloudFormation/issues/13)
+
 # 1.0.3
 
 * Fix - Incorrect handling of DisableRollback parameter. [Issue link](https://github.com/fireflycons/Firefly.CloudFormation/issues/12)

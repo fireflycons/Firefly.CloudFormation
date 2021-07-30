@@ -655,6 +655,13 @@ namespace Firefly.CloudFormation
                 // ReSharper disable once PossibleNullReferenceException - we will go round the above loop at least once
                 var reason = describeChangeSetResponse.StatusReason;
 
+                if (reason.Contains("Access Denied") && this.usePreviousTemplate)
+                {
+                    // Likely that lifecycle policy has removed the previous template.
+                    throw new
+                        StackOperationException($"Unable to create changeset: It is probable that the template has been explicitly deleted or removed by lifecycle policy on your bucket. Please retry specifying the path to the template file");
+                }
+
                 if (!NoChangeMessages.Any(msg => reason.StartsWith(msg)))
                 {
                     throw new StackOperationException($"Unable to create changeset: {reason}");
