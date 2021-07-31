@@ -215,14 +215,26 @@ Task("PushNuget")
     .WithCriteria(IsRunningOnWindows())
     .Does(() => {
 
-        // Set env var NUGET_ENDPOINT to publish to a feed other than nuget.org
-        // According to NuGet documentation, a .snupkg in the same directory should also be pushed.
-        NuGetPush(nugetPackagePath.GetFilename(), new NuGetPushSettings {
-                Source = EnvironmentVariable<string>("NUGET_ENDPOINT", "https://api.nuget.org/v3/index.json"),
-                ApiKey = EnvironmentVariable("NUGET_API_KEY"),
-                WorkingDirectory = nugetPackagePath.GetDirectory(),
-                Verbosity = NuGetVerbosity.Detailed
-            });
+        var package = FindNugetPackage();
+        var oldcwd = Context.Environment.WorkingDirectory;
+        var workingDirectory = package.GetDirectory();
+
+        try
+        {
+            Context.Environment.WorkingDirectory = workingDirectory;
+            // Set env var NUGET_ENDPOINT to publish to a feed other than nuget.org
+            // According to NuGet documentation, a .snupkg in the same directory should also be pushed.
+            NuGetPush(package.GetFilename(), new NuGetPushSettings {
+                    Source = EnvironmentVariable<string>("NUGET_ENDPOINT", "https://api.nuget.org/v3/index.json"),
+                    ApiKey = EnvironmentVariable("NUGET_API_KEY"),
+                    WorkingDirectory = workingDirectory,
+                    Verbosity = NuGetVerbosity.Detailed
+                });
+        }
+        finally
+        {
+            Context.Environment.WorkingDirectory = oldcwd;
+        }
     });
 
 Task("Build")
@@ -366,6 +378,20 @@ async Task UploadAppveyorArtifact(FilePath artifact)
             }
         }
     }
+}
+
+FilePath FindNugetPackage()
+{
+    var packageFileName = $"{mainProjectFile.GetFilenameWithoutExtension()}.{buildVersion}.nupkg";
+    var package = GetFiles(new GlobPattern(projectRoot + File($"**/packageFileName"))).FirstOrDefault();
+
+    if (package == null)
+    {
+        throw new FileNotFoundException($"Cannot find {packageFileName}");
+    }
+
+    Information($"Package found at {package.ToString()}");
+    return package;
 }
 
 void UploadTestResults()
