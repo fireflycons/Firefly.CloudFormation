@@ -396,7 +396,7 @@ async Task UploadAppveyorArtifact(FilePath artifact)
 FilePath FindNugetPackage()
 {
     var packageFileName = $"{mainProjectFile.GetFilenameWithoutExtension()}.{buildVersion}.nupkg";
-    var glob = projectRoot + File($"**/*.nupkg");
+    var glob = projectRoot + File($"**/Firefly.CloudFormation*.nupkg");
 
     Information($"Searching: {glob}");
 
