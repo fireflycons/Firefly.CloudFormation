@@ -202,6 +202,19 @@ Task("UploadXrefMap")
         Information(result);
     });
 
+Task("VerifyNugetPackage")
+    .Does(() => {
+
+        if (buildPackage)
+        {
+            nugetPackagePath = FindNugetPackage();
+        }
+        else
+        {
+            Information("Build Package is false");
+        }
+    });
+
 Task("PushAppveyor")
     .WithCriteria(IsRunningOnWindows())
     .WithCriteria(isAppveyor)
@@ -215,16 +228,15 @@ Task("PushNuget")
     .WithCriteria(IsRunningOnWindows())
     .Does(() => {
 
-        var package = FindNugetPackage();
         var oldcwd = Context.Environment.WorkingDirectory;
-        var workingDirectory = package.GetDirectory();
+        var workingDirectory = nugetPackagePath.GetDirectory();
 
         try
         {
             Context.Environment.WorkingDirectory = workingDirectory;
             // Set env var NUGET_ENDPOINT to publish to a feed other than nuget.org
             // According to NuGet documentation, a .snupkg in the same directory should also be pushed.
-            NuGetPush(package.GetFilename(), new NuGetPushSettings {
+            NuGetPush(nugetPackagePath.GetFilename(), new NuGetPushSettings {
                     Source = EnvironmentVariable<string>("NUGET_ENDPOINT", "https://api.nuget.org/v3/index.json"),
                     ApiKey = EnvironmentVariable("NUGET_API_KEY"),
                     WorkingDirectory = workingDirectory,
@@ -254,8 +266,9 @@ Task("BuildDocumentation")
 
 Task("PushPackage")
     .IsDependentOn("Init")
-    .IsDependentOn("PushAppveyor")
-    .IsDependentOn("PushNuget");
+    .IsDependentOn("VerifyNugetPackage")
+    .IsDependentOn("PushNuget")
+    .IsDependentOn("PushAppveyor");
 
 Task("Default")
     .IsDependentOn("Build")
@@ -383,7 +396,11 @@ async Task UploadAppveyorArtifact(FilePath artifact)
 FilePath FindNugetPackage()
 {
     var packageFileName = $"{mainProjectFile.GetFilenameWithoutExtension()}.{buildVersion}.nupkg";
-    var package = GetFiles(new GlobPattern(projectRoot + File($"**/packageFileName"))).FirstOrDefault();
+    var glob = projectRoot + File($"**/*.nupkg");
+
+    Information($"Searching: {glob}");
+
+    var package = GetFiles(new GlobPattern(glob)).FirstOrDefault();
 
     if (package == null)
     {
