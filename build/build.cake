@@ -211,37 +211,18 @@ Task("PushAppveyor")
     });
 
 Task("PushNuget")
+    .WithCriteria(isReleasePublication || !string.IsNullOrEmpty(EnvironmentVariable("NUGET_ENDPOINT")))
     .WithCriteria(IsRunningOnWindows())
     .Does(() => {
 
-        var package = nugetPackagePath.GetFilename();
-        var workingDirectory = nugetPackagePath.GetDirectory();
-
-        Information($"Working Dir: {workingDirectory}");
-        Information($"Package: {package}, Exists: {FileExists(nugetPackagePath)}");
-
-        if (isReleasePublication || !string.IsNullOrEmpty(EnvironmentVariable("NUGET_ENDPOINT")))
-        {
-            var oldcwd = Context.Environment.WorkingDirectory;
-
-            try
-            {
-                Context.Environment.WorkingDirectory = workingDirectory;
-
-                // Set env var NUGET_ENDPOINT to publish to a feed other than nuget.org
-                // According to NuGet documentation, a .snupkg in the same directory should also be pushed.
-                NuGetPush(package, new NuGetPushSettings {
-                        Source = EnvironmentVariable<string>("NUGET_ENDPOINT", "https://api.nuget.org/v3/index.json"),
-                        ApiKey = EnvironmentVariable("NUGET_API_KEY"),
-                        WorkingDirectory = workingDirectory,
-                        Verbosity = NuGetVerbosity.Detailed
-                    });
-            }
-            finally
-            {
-                Context.Environment.WorkingDirectory = oldcwd;
-            }
-        }
+        // Set env var NUGET_ENDPOINT to publish to a feed other than nuget.org
+        // According to NuGet documentation, a .snupkg in the same directory should also be pushed.
+        NuGetPush(nugetPackagePath.GetFilename(), new NuGetPushSettings {
+                Source = EnvironmentVariable<string>("NUGET_ENDPOINT", "https://api.nuget.org/v3/index.json"),
+                ApiKey = EnvironmentVariable("NUGET_API_KEY"),
+                WorkingDirectory = nugetPackagePath.GetDirectory(),
+                Verbosity = NuGetVerbosity.Detailed
+            });
     });
 
 Task("Build")
