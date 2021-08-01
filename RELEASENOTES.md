@@ -1,3 +1,7 @@
+# 1.0.5
+
+* Fix - Template parser should handle include transforms without throwing an error. [Issue link](https://github.com/fireflycons/Firefly.CloudFormation/issues/14)
+
 # 1.0.4
 
 * Improvement - S3 Access Denied when using UsePreviousTemplate. [Issue link](https://github.com/fireflycons/Firefly.CloudFormation/issues/13)
