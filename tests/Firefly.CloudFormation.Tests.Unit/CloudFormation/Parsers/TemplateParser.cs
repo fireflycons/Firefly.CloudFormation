@@ -65,6 +65,14 @@
         public IEnumerable<ITemplateResource> Resources { get; private set; }
 
         /// <summary>
+        /// Gets the macro resources.
+        /// </summary>
+        /// <value>
+        /// The macro resources.
+        /// </value>
+        public IEnumerable<ITemplateResource> MacroResources { get; private set; }
+
+        /// <summary>
         /// Gets the template description.
         /// </summary>
         /// <value>
@@ -203,6 +211,15 @@
             this.Resources.First().LogicalName.Should().Be("Vpc");
         }
 
+        [Theory]
+        [InlineData(Json)]
+        [InlineData(Yaml)]
+        public void ShoudHaveMacroResourceNamedBucket(string format)
+        {
+            this.Arrange(format);
+            this.MacroResources.First().LogicalName.Should().Be("Bucket");
+        }
+
         /// <summary>
         /// Arrange test for specified template format.
         /// </summary>
@@ -219,6 +236,7 @@
                     this.TemplateDescription = this.fixture.JsonTemplateDescription;
                     this.NestedStacks = this.fixture.JsonNestedStacks.ToList();
                     this.Resources = this.fixture.JsonResources;
+                    this.MacroResources = this.fixture.JsonIncludeResources;
                     break;
 
                 case "YAML":
@@ -227,7 +245,7 @@
                     this.TemplateDescription = this.fixture.YamlTemplateDescription;
                     this.NestedStacks = this.fixture.YamlNestedStacks.ToList();
                     this.Resources = this.fixture.YamlResources;
-
+                    this.MacroResources = this.fixture.YamlIncludeResources;
                     break;
             }
         }

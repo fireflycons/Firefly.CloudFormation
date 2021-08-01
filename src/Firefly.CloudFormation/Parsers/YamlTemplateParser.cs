@@ -23,7 +23,7 @@
                 {
                     ResourceKeyName, ParameterKeyName, "Type", "Description", "Default", "AllowedValues",
                     "AllowedPattern", "NoEcho", "ConstraintDescription", "MinLength", "MaxLength", "MinValue",
-                    "MaxValue"
+                    "MaxValue", "Fn::Transform", "Name"
                 }.ToDictionary(key => key, key => new YamlScalarNode(key));
 
         /// <summary>
@@ -146,15 +146,18 @@
             {
                 var resourceName = ((YamlScalarNode)resourceNode.Key).Value;
                 var resource = ((YamlMappingNode)resourceNode.Value).Children;
+                YamlScalarNode type = null;
 
-                if (!resource.ContainsKey(this.propertyKeys["Type"]))
+                if (resource.ContainsKey(this.propertyKeys["Type"]))
+                {
+                    type = (YamlScalarNode)resource[this.propertyKeys["Type"]];
+                }
+                else if (!this.IsIncludeMacro(resource))
                 {
                     throw new FormatException($"Resource {resourceName} has no Type property");
                 }
 
-                var type = (YamlScalarNode)resource[this.propertyKeys["Type"]];
-
-                if (type.Value == NestedStackType)
+                if (type?.Value == NestedStackType)
                 {
                     if (!string.IsNullOrEmpty(baseStackName))
                     {
@@ -188,15 +191,18 @@
             {
                 var resourceName = ((YamlScalarNode)resourceNode.Key).Value;
                 var resource = ((YamlMappingNode)resourceNode.Value).Children;
+                YamlScalarNode type = null;
 
-                if (!resource.ContainsKey(this.propertyKeys["Type"]))
+                if (resource.ContainsKey(this.propertyKeys["Type"]))
+                {
+                    type = (YamlScalarNode)resource[this.propertyKeys["Type"]];
+                }
+                else if (!this.IsIncludeMacro(resource))
                 {
                     throw new FormatException($"Resource {resourceName} has no Type property");
                 }
 
-                var type = (YamlScalarNode)resource[this.propertyKeys["Type"]];
-
-                if (type.Value == NestedStackType)
+                if (type?.Value == NestedStackType)
                 {
                     resourceNames.Add(stackName + "-" + resourceName + string.Empty.PadRight(NestedStackPadWidth));
                 }
@@ -224,15 +230,25 @@
             {
                 var resourceName = ((YamlScalarNode)resourceNode.Key).Value;
                 var resource = ((YamlMappingNode)resourceNode.Value).Children;
+                string type = null;
 
-                if (!resource.ContainsKey(this.propertyKeys["Type"]))
+                if (resource.ContainsKey(this.propertyKeys["Type"]))
+                {
+                    type = ((YamlScalarNode)resource[this.propertyKeys["Type"]]).Value;
+                }
+                else if (this.IsIncludeMacro(resource))
+                {
+                    type = TemplateResource.IncludeMacro;
+                }
+                else
                 {
                     throw new FormatException($"Resource {resourceName} has no Type property");
                 }
 
-                var type = (YamlScalarNode)resource[this.propertyKeys["Type"]];
-
-                resources.Add(TemplateResource.Create(resourceNode.Value, resourceName, type.Value));
+                if (type != null)
+                {
+                    resources.Add(TemplateResource.Create(resourceNode.Value, resourceName, type));
+                }
             }
 
             return resources;
@@ -264,6 +280,28 @@
                 this.yaml.Save(sw, false);
                 return sw.ToString();
             }
+        }
+
+        private bool IsIncludeMacro(IDictionary<YamlNode, YamlNode> resource)
+        {
+            if (!resource.ContainsKey(this.propertyKeys["Fn::Transform"]))
+            {
+                return false;
+            }
+
+            var macro = (YamlMappingNode)resource[this.propertyKeys["Fn::Transform"]];
+
+            if (!macro.Children.TryGetValue(this.propertyKeys["Name"], out var nameNode))
+            {
+                return false;
+            }
+
+            if (nameNode is YamlScalarNode sn)
+            {
+                return sn.Value == TemplateResource.IncludeMacro;
+            }
+
+            return false;
         }
 
         /// <summary>

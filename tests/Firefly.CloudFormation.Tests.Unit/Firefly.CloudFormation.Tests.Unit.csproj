@@ -12,6 +12,8 @@
     <None Remove="resources\progetDockerCloudFormation.yaml" />
     <None Remove="resources\test-imports.json" />
     <None Remove="resources\test-imports.yaml" />
+    <None Remove="resources\test-include-macro.json" />
+    <None Remove="resources\test-include-macro.yaml" />
     <None Remove="resources\test-oversize.json" />
     <None Remove="resources\test-resource-update.json" />
     <None Remove="resources\test-resource-update.yaml" />
@@ -25,6 +27,8 @@
     <EmbeddedResource Include="resources\progetDockerCloudFormation.yaml" />
     <EmbeddedResource Include="resources\test-imports.json" />
     <EmbeddedResource Include="resources\test-imports.yaml" />
+    <EmbeddedResource Include="resources\test-include-macro.json" />
+    <EmbeddedResource Include="resources\test-include-macro.yaml" />
     <EmbeddedResource Include="resources\test-oversize.json" />
     <EmbeddedResource Include="resources\test-nested-stack.json" />
     <EmbeddedResource Include="resources\test-nested-stack.yaml" />

@@ -24,6 +24,12 @@
         [EmbeddedResource("test-nested-stack.yaml")]
         private string testNestedStackYamlString;
 
+        [EmbeddedResource("test-include-macro.json")]
+        private string testIncludeMacroJsonString;
+
+        [EmbeddedResource("test-include-macro.yaml")]
+        private string testIncludeMacroYamlString;
+
         public TemplateParserFixture()
         {
             var jsonParser = Firefly.CloudFormation.Parsers.TemplateParser.Create(this.testStackJsonString);
@@ -43,6 +49,12 @@
 
             this.JsonNestedStacks = jsonParser.GetNestedStackNames();
             this.YamlNestedStacks = yamlParser.GetNestedStackNames();
+
+            jsonParser = Firefly.CloudFormation.Parsers.TemplateParser.Create(this.testIncludeMacroJsonString);
+            yamlParser = Firefly.CloudFormation.Parsers.TemplateParser.Create(this.testIncludeMacroYamlString);
+
+            this.JsonIncludeResources = jsonParser.GetResources();
+            this.YamlIncludeResources = yamlParser.GetResources();
         }
 
         internal List<TemplateFileParameter> JsonParameters { get; }
@@ -60,6 +72,10 @@
         internal IEnumerable<ITemplateResource> JsonResources { get; }
 
         internal IEnumerable<ITemplateResource> YamlResources { get; }
+
+        internal IEnumerable<ITemplateResource> JsonIncludeResources { get; }
+
+        internal IEnumerable<ITemplateResource> YamlIncludeResources { get; }
 
         public void Dispose()
         {

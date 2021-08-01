@@ -16,6 +16,11 @@
     public abstract class TemplateResource : ITemplateResource
     {
         /// <summary>
+        /// Placeholder type name for a resource whose type cannot be determined due to the type definition being within the included snippet
+        /// </summary>
+        public const string IncludeMacro = "AWS::Include";
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="TemplateResource"/> class.
         /// </summary>
         /// <param name="rawResource">The raw resource.</param>

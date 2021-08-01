@@ -95,7 +95,7 @@
         }
 
         /// <summary>
-        /// Gets logical resource names of nested stacks declared in the given template, accounting for how CLoudFormation will name them when the template runs.
+        /// Gets logical resource names of nested stacks declared in the given template, accounting for how CloudFormation will name them when the template runs.
         /// Does not recurse these.
         /// </summary>
         /// <param name="baseStackName">Name of the base stack</param>
@@ -111,12 +111,12 @@
             {
                 var type = resource.Children()["Type"].FirstOrDefault();
 
-                if (type == null)
+                if (type == null && !IsIncludeMacro(resource))
                 {
                     throw new FormatException($"Resource {resource.Name} has no Type property");
                 }
 
-                if (type.Value<string>() == TemplateParser.NestedStackType)
+                if (type?.Value<string>() == TemplateParser.NestedStackType)
                 {
                     if (!string.IsNullOrEmpty(baseStackName))
                     {
@@ -148,12 +148,12 @@
             {
                 var type = resource.Children()["Type"].FirstOrDefault();
 
-                if (type == null)
+                if (type == null && !IsIncludeMacro(resource))
                 {
                     throw new FormatException($"Resource {resource.Name} has no Type property");
                 }
 
-                if (type.Value<string>() == TemplateParser.NestedStackType)
+                if (type?.Value<string>() == TemplateParser.NestedStackType)
                 {
                     resourceNames.Add(stackName + "-" + resource.Name + string.Empty.PadRight(TemplateParser.NestedStackPadWidth));
                 }
@@ -183,7 +183,14 @@
 
                 if (type == null)
                 {
-                    throw new FormatException($"Resource {name} has no Type property");
+                    if (IsIncludeMacro(resource))
+                    {
+                        type = new JValue(TemplateResource.IncludeMacro);
+                    }
+                    else
+                    {
+                        throw new FormatException($"Resource {name} has no Type property");
+                    }
                 }
 
                 resources.Add(TemplateResource.Create(resource, name, type.Value<string>()));
@@ -278,6 +285,27 @@
             var value = parameterProperties.Children()[keyName].FirstOrDefault()?.Value<string>();
 
             return value != null ? new Regex(value) : null;
+        }
+
+        /// <summary>
+        /// Determines whether the specified resource is a macro.
+        /// </summary>
+        /// <param name="resource">The resource.</param>
+        /// <returns>
+        ///   <c>true</c> if the specified resource is a macro; otherwise, <c>false</c>.
+        /// </returns>
+        private static bool IsIncludeMacro(JToken resource)
+        {
+            var transform = resource.Children()["Fn::Transform"].FirstOrDefault();
+
+            var name = transform?.Children<JProperty>().FirstOrDefault(tok => tok.Name == "Name");
+
+            if (name == null)
+            {
+                return false;
+            }
+
+            return name.Value.ToString() == TemplateResource.IncludeMacro;
         }
     }
 }
