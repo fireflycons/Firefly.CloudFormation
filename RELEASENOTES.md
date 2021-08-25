@@ -1,3 +1,7 @@
+# 1.0.6
+
+* Enhancement - Add a couple of new methods for stack examination requied by PSCloudFomation.
+
 # 1.0.5
 
 * Fix - Template parser should handle include transforms without throwing an error. [Issue link](https://github.com/fireflycons/Firefly.CloudFormation/issues/14)
@@ -48,7 +52,7 @@ Fix: Incorrect error message when a template file is not found: `ArgumentExcepti
 
 # 0.2.3
 
-* Fix - Retrieving template for CREATE_FAILED SAM template stack throws exception. Needed to 
+* Fix - Retrieving template for CREATE_FAILED SAM template stack throws exception. Needed to
 
 Needed for [this PSCloudFormation issue](https://github.com/fireflycons/PSCloudFormation/issues/74)
 
@@ -58,7 +62,7 @@ Needed for [this PSCloudFormation issue](https://github.com/fireflycons/PSCloudF
 
 Needed for [this PSCloudFormation issue](https://github.com/fireflycons/PSCloudFormation/issues/68)
 
-# 0.2.1 
+# 0.2.1
 
 * Address potential race condition when monitoring stack events during creation of set of nested stacks. It seems it's possible to retrieve a nested stack resource prior to it being assigned a physical resource ID.
 

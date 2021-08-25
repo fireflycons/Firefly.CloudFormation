@@ -140,6 +140,62 @@
         }
 
         /// <summary>
+        /// Gets the stack resources.
+        /// </summary>
+        /// <param name="stackName">Name of the stack.</param>
+        /// <returns>List of resources</returns>
+        /// <exception cref="Firefly.CloudFormation.Model.StackOperationException">Stack not found.</exception>
+        public async Task<List<StackResource>> GetStackResources(string stackName)
+        {
+            using (var client = this.clientFactory.CreateCloudFormationClient())
+            {
+                try
+                {
+                    var response =
+                        await client.DescribeStackResourcesAsync(new DescribeStackResourcesRequest { StackName = stackName });
+
+                    return response.StackResources;
+                }
+                catch (Exception ex)
+                {
+                    if (ex.Message.Contains($"Stack with id {stackName} does not exist"))
+                    {
+                        throw new StackOperationException(null, StackOperationalState.NotFound);
+                    }
+
+                    throw;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets the template summary.
+        /// </summary>
+        /// <param name="stackName">Name of the stack.</param>
+        /// <returns>A <see cref="GetTemplateSummaryResponse"/> containing information about the stack's template.</returns>
+        /// <exception cref="Firefly.CloudFormation.Model.StackOperationException">Stack not found.</exception>
+        public async Task<GetTemplateSummaryResponse> GetTemplateSummary(string stackName)
+        {
+            using (var client = this.clientFactory.CreateCloudFormationClient())
+            {
+                try
+                {
+                    return 
+                        await client.GetTemplateSummaryAsync(new GetTemplateSummaryRequest { StackName = stackName });
+                }
+                catch (Exception ex)
+                {
+                    if (ex.Message.Contains($"Stack with id {stackName} does not exist"))
+                    {
+                        throw new StackOperationException(null, StackOperationalState.NotFound);
+                    }
+
+                    throw;
+                }
+            }
+        }
+
+        /// <summary>
         /// Describes the named stack
         /// </summary>
         /// <param name="stackName">Name of the stack.</param>
