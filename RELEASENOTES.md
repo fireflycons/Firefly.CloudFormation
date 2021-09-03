@@ -1,3 +1,7 @@
+# 1.0.7
+
+* Fix - Parameter min/max validation is incorrect. [Issue link](https://github.com/fireflycons/Firefly.CloudFormation/issues/16)
+
 # 1.0.6
 
 * Enhancement - Add a couple of new methods for stack examination requied by PSCloudFomation.

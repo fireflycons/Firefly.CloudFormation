@@ -73,10 +73,12 @@
                             NoEcho = GetNodeValue<bool>(param, "NoEcho"),
                             MinLength = GetNodeValue<int>(param, "MinLength"),
                             MaxLength = GetNodeValue<int>(param, "MaxLength"),
-                            MinValue = GetNodeValue<double>(param, "MinLength"),
+                            MinValue = GetNodeValue<double>(param, "MinValue"),
                             MaxValue = GetNodeValue<double>(param, "MaxValue"),
                             HasMaxValue = HasNode(param, "MaxValue"),
-                            HasMaxLength = HasNode(param, "MaxLength")
+                            HasMaxLength = HasNode(param, "MaxLength"),
+                            HasMinValue = HasNode(param, "MinValue"),
+                            HasMinLength = HasNode(param, "MinLength")
                         });
             }
 

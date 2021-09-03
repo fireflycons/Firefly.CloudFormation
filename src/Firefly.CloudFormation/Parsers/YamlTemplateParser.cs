@@ -102,10 +102,12 @@
                             NoEcho = this.GetNodeValue<bool>(param, "NoEcho"),
                             MinLength = this.GetNodeValue<int>(param, "MinLength"),
                             MaxLength = this.GetNodeValue<int>(param, "MaxLength"),
-                            MinValue = this.GetNodeValue<double>(param, "MinLength"),
+                            MinValue = this.GetNodeValue<double>(param, "MinValue"),
                             MaxValue = this.GetNodeValue<double>(param, "MaxValue"),
                             HasMaxValue = this.HasNode(param, "MaxValue"),
-                            HasMaxLength = this.HasNode(param, "MaxLength")
+                            HasMaxLength = this.HasNode(param, "MaxLength"),
+                            HasMinValue = this.HasNode(param, "MinValue"),
+                            HasMinLength = this.HasNode(param, "MinLength")
                     });
             }
 
