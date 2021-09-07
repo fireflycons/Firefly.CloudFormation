@@ -100,10 +100,10 @@
                             AllowedPattern = this.GetRegexNodeValue(param, "AllowedPattern"),
                             AllowedValues = this.GetArrayNodeValues(param, "AllowedValues"),
                             NoEcho = this.GetNodeValue<bool>(param, "NoEcho"),
-                            MinLength = this.GetNodeValue<int>(param, "MinLength"),
-                            MaxLength = this.GetNodeValue<int>(param, "MaxLength"),
-                            MinValue = this.GetNodeValue<double>(param, "MinValue"),
-                            MaxValue = this.GetNodeValue<double>(param, "MaxValue"),
+                            MinLength = this.GetNodeValue<int>(param, "MinLength", 0),
+                            MaxLength = this.GetNodeValue<int>(param, "MaxLength", int.MaxValue),
+                            MinValue = this.GetNodeValue<double>(param, "MinValue", double.MinValue),
+                            MaxValue = this.GetNodeValue<double>(param, "MaxValue", double.MaxValue),
                             HasMaxValue = this.HasNode(param, "MaxValue"),
                             HasMaxLength = this.HasNode(param, "MaxLength"),
                             HasMinValue = this.HasNode(param, "MinValue"),
@@ -354,13 +354,14 @@
         /// <typeparam name="T">Any <see cref="IConvertible"/> type</typeparam>
         /// <param name="parameterProperties">The parameter properties.</param>
         /// <param name="keyName">Name of the key.</param>
+        /// <param name="defaultValue">Optional default value to set; else type's default</param>
         /// <returns>Value of parameter node</returns>
-        private T GetNodeValue<T>(IDictionary<YamlNode, YamlNode> parameterProperties, string keyName)
+        private T GetNodeValue<T>(IDictionary<YamlNode, YamlNode> parameterProperties, string keyName, T defaultValue = default)
             where T : IConvertible
         {
             if (!parameterProperties.ContainsKey(this.propertyKeys[keyName]))
             {
-                return default;
+                return defaultValue;
             }
 
             var val = ((YamlScalarNode)parameterProperties[this.propertyKeys[keyName]]).Value;

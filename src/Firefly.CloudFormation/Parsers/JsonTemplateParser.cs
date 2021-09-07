@@ -71,10 +71,10 @@
                             AllowedPattern = GetRegexNodeValue(param, "AllowedPattern"),
                             AllowedValues = GetArrayNodeValues(param, "AllowedValues"),
                             NoEcho = GetNodeValue<bool>(param, "NoEcho"),
-                            MinLength = GetNodeValue<int>(param, "MinLength"),
-                            MaxLength = GetNodeValue<int>(param, "MaxLength"),
-                            MinValue = GetNodeValue<double>(param, "MinValue"),
-                            MaxValue = GetNodeValue<double>(param, "MaxValue"),
+                            MinLength = GetNodeValue<int>(param, "MinLength", 0),
+                            MaxLength = GetNodeValue<int>(param, "MaxLength", int.MaxValue),
+                            MinValue = GetNodeValue<double>(param, "MinValue", Double.MinValue),
+                            MaxValue = GetNodeValue<double>(param, "MaxValue", double.MaxValue),
                             HasMaxValue = HasNode(param, "MaxValue"),
                             HasMaxLength = HasNode(param, "MaxLength"),
                             HasMinValue = HasNode(param, "MinValue"),
@@ -267,13 +267,14 @@
         /// <typeparam name="T">Any <see cref="IConvertible"/> type</typeparam>
         /// <param name="parameterProperties">The parameter properties.</param>
         /// <param name="keyName">Name of the key.</param>
+        /// <param name="defaultValue">Optional default value to set; else type's default</param>
         /// <returns>Value of parameter node</returns>
-        private static T GetNodeValue<T>(JToken parameterProperties, string keyName)
+        private static T GetNodeValue<T>(JToken parameterProperties, string keyName, T defaultValue = default)
             where T : IConvertible
         {
             var prop = parameterProperties.Children()[keyName].FirstOrDefault();
 
-            return prop != null ? prop.Value<T>() : default;
+            return prop != null ? prop.Value<T>() : defaultValue;
         }
 
         /// <summary>
