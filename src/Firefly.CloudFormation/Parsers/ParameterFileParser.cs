@@ -2,8 +2,11 @@
 {
     using System.Collections.Generic;
     using System.IO;
+    using System.Linq;
 
     using Firefly.CloudFormation.Model;
+
+    using YamlDotNet.Serialization;
 
     /// <summary>
     /// <para>
@@ -16,7 +19,7 @@
     /// </para>
     /// </summary>
     /// <seealso cref="InputFileParser" />
-    public abstract class ParameterFileParser : InputFileParser, IParameterFileParser
+    public class ParameterFileParser : InputFileParser, IParameterFileParser
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ParameterFileParser"/> class.
@@ -35,27 +38,20 @@
         /// <exception cref="InvalidDataException">Parameter file is empty is empty</exception>
         public static IParameterFileParser CreateParser(string templateBody)
         {
-            // ReSharper disable once SwitchStatementHandlesSomeKnownEnumValuesWithDefault
-            switch (InputFileParser.GetInputFileFormat(templateBody))
-            {
-                case SerializationFormat.Json:
-
-                    return new JsonParameterFileParser(templateBody);
-
-                case SerializationFormat.Yaml:
-
-                    return new YamlParameterFileParser(templateBody);
-
-                default:
-
-                    throw new InvalidDataException("Parameter file is empty");
-            }
+            return new ParameterFileParser(templateBody);
         }
 
         /// <summary>
         /// Parses a parameter file.
         /// </summary>
         /// <returns>A dictionary of parameter key-value pairs</returns>
-        public abstract IDictionary<string, string> ParseParameterFile();
+        public IDictionary<string, string> ParseParameterFile()
+        {
+            var deserializer = new DeserializerBuilder().Build();
+
+            var parameters = deserializer.Deserialize<List<ParameterFileEntry>>(this.FileContent);
+
+            return parameters.ToDictionary(p => p.ParameterKey, p => p.ParameterValue);
+        }
     }
 }
