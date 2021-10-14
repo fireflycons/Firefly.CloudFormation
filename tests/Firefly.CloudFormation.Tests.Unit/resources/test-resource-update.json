@@ -43,7 +43,7 @@
                 "MaxRetries": 0,
                 "Name": "cf-job1",
                 "Role": {
-                    "Ref": "MyJobRole"
+                    "Ref": "iamRole"
                 }
             }
         }

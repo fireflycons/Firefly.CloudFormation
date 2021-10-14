@@ -8,6 +8,7 @@
     using System.Linq;
 
     using Firefly.CloudFormation.Parsers;
+    using Firefly.CloudFormationParser;
     using Firefly.EmbeddedResourceLoader;
 
     public class TemplateParserFixture : AutoResourceLoader, IDisposable
@@ -57,9 +58,9 @@
             this.YamlIncludeResources = yamlParser.GetResources();
         }
 
-        internal List<TemplateFileParameter> JsonParameters { get; }
+        internal List<IParameter> JsonParameters { get; }
 
-        internal List<TemplateFileParameter> YamlParameters { get; }
+        internal List<IParameter> YamlParameters { get; }
 
         internal string JsonTemplateDescription { get; }
 
@@ -69,13 +70,13 @@
 
         internal IEnumerable<string> YamlNestedStacks { get; }
 
-        internal IEnumerable<ITemplateResource> JsonResources { get; }
+        internal IEnumerable<IResource> JsonResources { get; }
 
-        internal IEnumerable<ITemplateResource> YamlResources { get; }
+        internal IEnumerable<IResource> YamlResources { get; }
 
-        internal IEnumerable<ITemplateResource> JsonIncludeResources { get; }
+        internal IEnumerable<IResource> JsonIncludeResources { get; }
 
-        internal IEnumerable<ITemplateResource> YamlIncludeResources { get; }
+        internal IEnumerable<IResource> YamlIncludeResources { get; }
 
         public void Dispose()
         {

@@ -2,6 +2,8 @@
 {
     using System.Collections.Generic;
 
+    using Firefly.CloudFormationParser;
+
     /// <summary>
     /// Interface describing <see cref="TemplateParser"/>
     /// </summary>
@@ -32,14 +34,14 @@
         /// <summary>
         /// Gets the parameters.
         /// </summary>
-        /// <returns>List of <see cref="TemplateFileParameter"/></returns>
-        IEnumerable<TemplateFileParameter> GetParameters();
+        /// <returns>List of <see cref="IParameter"/></returns>
+        IEnumerable<IParameter> GetParameters();
 
         /// <summary>
         /// Gets the template resources.
         /// </summary>
         /// <returns>Enumerable of resources found in template</returns>
-        IEnumerable<ITemplateResource> GetResources();
+        IEnumerable<IResource> GetResources();
 
         /// <summary>
         /// Gets the template description.

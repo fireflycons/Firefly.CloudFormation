@@ -2,8 +2,12 @@
 {
     using System.Collections.Generic;
     using System.IO;
+    using System.Text;
 
     using Firefly.CloudFormation.Model;
+    using Firefly.CloudFormationParser;
+    using Firefly.CloudFormationParser.Serialization.Settings;
+    using Firefly.CloudFormationParser.TemplateObjects;
 
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
@@ -14,8 +18,10 @@
     /// <summary>
     /// Base class for CloudFormation template parsers.
     /// </summary>
-    public abstract class TemplateParser : InputFileParser, ITemplateParser
+    public class TemplateParser : ITemplateParser
     {
+        private readonly ITemplate template;
+
         /// <summary>
         /// The description key name
         /// </summary>
@@ -44,10 +50,10 @@
         /// <summary>
         /// Initializes a new instance of the <see cref="TemplateParser"/> class.
         /// </summary>
-        /// <param name="templateBody">The template body.</param>
-        protected TemplateParser(string templateBody)
-            : base(templateBody)
+        /// <param name="template">The template.</param>
+        protected TemplateParser(ITemplate template)
         {
+            this.template = template;
         }
 
         /// <summary>
@@ -58,20 +64,9 @@
         /// <exception cref="InvalidDataException">Template body is empty</exception>
         public static ITemplateParser Create(string templateBody)
         {
-            // ReSharper disable once SwitchStatementHandlesSomeKnownEnumValuesWithDefault
-            switch (InputFileParser.GetInputFileFormat(templateBody))
+            using (var settings = new StringDeserializerSettings(templateBody))
             {
-                case SerializationFormat.Json:
-
-                    return new JsonTemplateParser(templateBody);
-
-                case SerializationFormat.Yaml:
-
-                    return new YamlTemplateParser(templateBody);
-
-                default:
-
-                    throw new InvalidDataException("Template body is empty");
+                return new TemplateParser(Template.Deserialize(settings).Result);
             }
         }
 
@@ -137,59 +132,58 @@
             }
         }
 
-        /// <summary>
-        /// Gets the logical resource names.
-        /// </summary>
-        /// <param name="stackName">Name of the parent stack. Used to prefix nested stack resources</param>
-        /// <returns>List of resource names.</returns>
-        public abstract IEnumerable<string> GetLogicalResourceNames(string stackName);
+        /// <inheritdoc />
+        public IEnumerable<string> GetLogicalResourceNames(string stackName)
+        {
+            return this.template.GetLogicalResourceNames(stackName);
+        }
 
-        /// <summary>
-        /// Gets logical resource names of nested stacks declared in the given template
-        /// Does not recurse these.
-        /// </summary>
-        /// <returns>List of nested stack logical resource names, if any.</returns>
+        /// <inheritdoc />
         public IEnumerable<string> GetNestedStackNames()
         {
             return this.GetNestedStackNames(string.Empty);
         }
 
-        /// <summary>
-        /// Gets logical resource names of nested stacks declared in the given template, accounting for how CloudFormation will name them when the template runs.
-        /// Does not recurse these.
-        /// </summary>
-        /// <param name="baseStackName">Name of the base stack</param>
-        /// <returns>List of nested stack logical resource names, if any.</returns>
-        public abstract IEnumerable<string> GetNestedStackNames(string baseStackName);
+        /// <inheritdoc />
+        public IEnumerable<string> GetNestedStackNames(string baseStackName)
+        {
+            return this.template.GetNestedStackNames(baseStackName);
+        }
 
-        /// <summary>
-        /// Gets the parameters.
-        /// </summary>
-        /// <returns>List of <see cref="TemplateFileParameter"/></returns>
-        public abstract IEnumerable<TemplateFileParameter> GetParameters();
+        /// <inheritdoc />
+        public IEnumerable<IParameter> GetParameters()
+        {
+            return this.template.Parameters;
+        }
 
-        /// <summary>
-        /// Gets the template resources.
-        /// </summary>
-        /// <returns>Enumerable of resources found in template</returns>
-        public abstract IEnumerable<ITemplateResource> GetResources();
+        /// <inheritdoc />
+        public IEnumerable<IResource> GetResources()
+        {
+            return this.template.Resources;
+        }
 
-        /// <summary>
-        /// Gets the template description.
-        /// </summary>
-        /// <returns>Content of description property from template</returns>
-        public abstract string GetTemplateDescription();
+        /// <inheritdoc />
+        public string GetTemplateDescription()
+        {
+            return this.template.GetTemplateDescription();
+        }
 
         /// <summary>
         /// Saves the template to the specified path.
         /// </summary>
         /// <param name="path">The path.</param>
-        public abstract void Save(string path);
+        public void Save(string path)
+        {
+            File.WriteAllText(path, this.GetTemplate(), new UTF8Encoding(false));
+        }
 
         /// <summary>
         /// Gets the template by re-serializing the current state of the representation model.
         /// </summary>
         /// <returns>Template body as string</returns>
-        public abstract string GetTemplate();
+        public string GetTemplate()
+        {
+            return Template.Serialize(this.template);
+        }
     }
 }

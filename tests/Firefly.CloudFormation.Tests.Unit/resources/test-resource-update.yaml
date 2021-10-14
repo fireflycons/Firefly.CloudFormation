@@ -29,4 +29,4 @@ Resources:
         MaxConcurrentRuns: 2
       MaxRetries: 0
       Name: cf-job1
-      Role: !Ref 'MyJobRole'
+      Role: !Ref 'iamRole'
