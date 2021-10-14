@@ -9,17 +9,18 @@
     /// <summary>
     /// Extension methods for <c>ITemplate</c>
     /// </summary>
+    // ReSharper disable once InconsistentNaming
     public static class ITemplateExtensions
     {
         /// <summary>
         /// Amount of padding to add to resource names to include random chars added by CloudFormation
         /// </summary>
-        internal const int NestedStackPadWidth = 14;
+        private const int NestedStackPadWidth = 14;
 
         /// <summary>
         /// The nested stack type
         /// </summary>
-        internal const string NestedStackType = "AWS::CloudFormation::Stack";
+        private const string NestedStackType = "AWS::CloudFormation::Stack";
 
         /// <summary>
         /// Gets the logical resource names.

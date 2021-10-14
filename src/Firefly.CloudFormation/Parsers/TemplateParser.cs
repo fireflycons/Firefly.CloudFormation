@@ -20,32 +20,10 @@
     /// </summary>
     public class TemplateParser : ITemplateParser
     {
+        /// <summary>
+        /// The template
+        /// </summary>
         private readonly ITemplate template;
-
-        /// <summary>
-        /// The description key name
-        /// </summary>
-        internal const string DescriptionKeyName = "Description";
-
-        /// <summary>
-        /// Amount of padding to add to resource names to include random chars added by CloudFormation
-        /// </summary>
-        internal const int NestedStackPadWidth = 14;
-
-        /// <summary>
-        /// The nested stack type
-        /// </summary>
-        internal const string NestedStackType = "AWS::CloudFormation::Stack";
-
-        /// <summary>
-        /// The parameter key name
-        /// </summary>
-        internal const string ParameterKeyName = "Parameters";
-
-        /// <summary>
-        /// The resource key name
-        /// </summary>
-        internal const string ResourceKeyName = "Resources";
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TemplateParser"/> class.

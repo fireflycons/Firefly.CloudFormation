@@ -2,11 +2,8 @@
 {
     using System.Collections.Generic;
     using System.IO;
-    using System.Linq;
 
     using Amazon.CloudFormation.Model;
-
-    using Firefly.CloudFormation.Model;
 
     using YamlDotNet.Serialization;
 
