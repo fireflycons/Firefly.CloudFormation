@@ -1,3 +1,6 @@
+# 1.0.8 
+
+* Fix - MaxLength for string params less than min length - introduced by previous change. [Issue link](https://github.com/fireflycons/Firefly.CloudFormation/issues/17)
 # 1.0.7
 
 * Fix - Parameter min/max validation is incorrect. [Issue link](https://github.com/fireflycons/Firefly.CloudFormation/issues/16)
