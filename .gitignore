@@ -344,3 +344,4 @@ healthchecksdb
 
 test-output/
 build/build.ver
+*.debug.sln
