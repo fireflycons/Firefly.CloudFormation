@@ -12,7 +12,7 @@ try
         Write-Host
         Write-Host "##" $_.BaseName
 
-        & $dotnet test $_.FullName --verbosity detailed --test-adapter-path:. --logger:Appveyor
+        & $dotnet test $_.FullName --verbosity normal --test-adapter-path:. --logger:Appveyor
 
         if ($LASTEXITCODE -ne 0)
         {
