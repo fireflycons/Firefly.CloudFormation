@@ -2,14 +2,27 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Description>This library provides a cleaner interface for managing AWS CloudFormation stacks.</Description>
-    <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
     <PackageTags>AWS;CloudFormation</PackageTags>
-    <Version>0.1.0</Version>
-    <AssemblyVersion>0.1.0.0</AssemblyVersion>
-    <FileVersion>0.1.0.0</FileVersion>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <IsPackable>true</IsPackable>
+    <PackageId>Firefly.CloudFormation</PackageId>
+    <GeneratePackageOnBuild>$(Generate_CloudFormation)</GeneratePackageOnBuild>
+    <Title>Firefly.CloudFormation</Title>
+
+    <!-- Overridden by CI -->
+    <Version>0.0.0</Version>
+    <AssemblyVersion>0.0.0</AssemblyVersion>
+    <FileVersion>0.0.0</FileVersion>
+
+    <Copyright>Copyright © 2021 Firefly IT Consulting Ltd.</Copyright>
+    <Description>
+This library provides a cleaner interface for managing AWS CloudFormation stacks.
+
+Supported platforms:
+- .NET Standard 2.0+
+
+Supports Source Link
+    </Description>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Polly" Version="7.2.1" />
