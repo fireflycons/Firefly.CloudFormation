@@ -17,8 +17,8 @@
     /// </summary>
     public class ResourcePropertyUpdate : AutoResourceLoader
     {
-        [EmbeddedResource("test-resource-update.json")]
-        private static string testResourceUpdateJson;
+        //[EmbeddedResource("test-resource-update.json")]
+        //private static string testResourceUpdateJson;
 
         [EmbeddedResource("test-resource-update.yaml")]
         private static string testResourceUpdateYaml;
