@@ -10,6 +10,7 @@
     /// Test parsing of stack parameter files
     /// </summary>
     /// <seealso cref="Xunit.IClassFixture{Firefly.CloudFormation.Tests.Unit.CloudFormation.Parsers.ParameterFileParserFixture}" />
+    [Collection("Sequential")]
     public class ParameterFileParser : IClassFixture<ParameterFileParserFixture>
     {
         /// <summary>

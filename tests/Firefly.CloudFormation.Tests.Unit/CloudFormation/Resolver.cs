@@ -16,6 +16,7 @@
 
     using Xunit;
 
+    [Collection("Sequential")]
     public class Resolver : IClassFixture<TestStackFixture>
     {
         private readonly TestStackFixture fixture;

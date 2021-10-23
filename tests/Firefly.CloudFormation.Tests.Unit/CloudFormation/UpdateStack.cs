@@ -22,6 +22,7 @@
     /// Test <c>UpdateStack</c> calls.
     /// </summary>
     /// <seealso cref="Xunit.IClassFixture{Firefly.CloudFormation.Tests.Unit.CloudFormation.TestStackFixture}" />
+    [Collection("Sequential")]
     public class UpdateStack : IClassFixture<TestStackFixture>
     {
         /// <summary>

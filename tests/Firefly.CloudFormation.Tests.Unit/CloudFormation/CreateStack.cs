@@ -17,6 +17,7 @@
     using Xunit;
     using Xunit.Abstractions;
 
+    [Collection("Sequential")]
     public class CreateStack : IClassFixture<TestStackFixture>
     {
         /// <summary>

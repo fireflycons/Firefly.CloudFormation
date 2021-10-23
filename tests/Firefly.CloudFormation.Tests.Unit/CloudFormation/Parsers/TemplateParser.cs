@@ -15,6 +15,7 @@
     /// Test the template parser
     /// </summary>
     /// <seealso cref="Xunit.IClassFixture{TemplateParserFixture}" />
+    [Collection("Sequential")]
     public class TemplateParser : IClassFixture<TemplateParserFixture>
     {
         /// <summary>
