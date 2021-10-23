@@ -15,6 +15,7 @@
     /// Tests updating of resource properties within a template.
     /// You would need to do this to implement the behaviour of <c>aws cloudformation package</c>
     /// </summary>
+    [Collection("Sequential")]
     public class ResourcePropertyUpdate : AutoResourceLoader
     {
         [EmbeddedResource("test-resource-update.json")]
@@ -31,13 +32,13 @@
             var parser = Firefly.CloudFormation.Parsers.TemplateParser.Create(testResourceUpdateJson);
             var resources = parser.GetResources();
 
-            var resource = resources.First(r => r.LogicalName == "MyJob");
+            var resource = resources.First(r => r.Name == "MyJob");
 
             // resource.UpdateResourceProperty("Code", new { S3Bucket = "bucket-name", S3Key = "code/lambda.zip" });
             resource.UpdateResourceProperty("Command.ScriptLocation", S3Location);
             var modifiedTemplate = parser.GetTemplate();
 
-            modifiedTemplate.Should().Contain($"\"ScriptLocation\": \"{S3Location}\"");
+            modifiedTemplate.Should().Contain($"ScriptLocation: {S3Location}");
             resource.GetResourcePropertyValue("Command.ScriptLocation").Should().Be(S3Location);
         }
 
@@ -50,7 +51,7 @@
             var parser = Firefly.CloudFormation.Parsers.TemplateParser.Create(testResourceUpdateYaml);
             var resources = parser.GetResources();
 
-            var resource = resources.First(r => r.LogicalName == "lambdaFunction");
+            var resource = resources.First(r => r.Name == "lambdaFunction");
 
             resource.UpdateResourceProperty("Code", new { S3Bucket, S3Key });
             var modifiedTemplate = parser.GetTemplate();

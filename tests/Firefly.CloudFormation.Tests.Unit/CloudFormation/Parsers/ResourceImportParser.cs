@@ -13,6 +13,7 @@
     /// Tests the resource import parser
     /// </summary>
     /// <seealso cref="Xunit.IClassFixture{Firefly.CloudFormation.Tests.Unit.CloudFormation.Parsers.ResourceImportParserFixture}" />
+    [Collection("Sequential")]
     public class ResourceImportParser : IClassFixture<ResourceImportParserFixture>
     {
         /// <summary>

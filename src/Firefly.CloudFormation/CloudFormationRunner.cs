@@ -659,7 +659,7 @@ namespace Firefly.CloudFormation
                 {
                     // Likely that lifecycle policy has removed the previous template.
                     throw new
-                        StackOperationException($"Unable to create changeset: It is probable that the template has been explicitly deleted or removed by lifecycle policy on your bucket. Please retry specifying the path to the template file");
+                        StackOperationException("Unable to create changeset: It is probable that the template has been explicitly deleted or removed by lifecycle policy on your bucket. Please retry specifying the path to the template file");
                 }
 
                 if (!NoChangeMessages.Any(msg => reason.StartsWith(msg)))

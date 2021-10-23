@@ -5,7 +5,7 @@
 
     using Amazon.CloudFormation.Model;
 
-    using Firefly.CloudFormation.Model;
+    using YamlDotNet.Serialization;
 
     /// <summary>
     /// <para>
@@ -30,7 +30,7 @@
     /// </para>
     /// </summary>
     /// <seealso cref="InputFileParser" />
-    public abstract class ResourceImportParser : InputFileParser, IResourceImportParser
+    public class ResourceImportParser : InputFileParser, IResourceImportParser
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ResourceImportParser"/> class.
@@ -49,27 +49,16 @@
         /// <exception cref="InvalidDataException">Resource import file is empty</exception>
         public static IResourceImportParser Create(string fileContent)
         {
-            // ReSharper disable once SwitchStatementHandlesSomeKnownEnumValuesWithDefault
-            switch (InputFileParser.GetInputFileFormat(fileContent))
-            {
-                case SerializationFormat.Json:
-
-                    return new JsonResourceImportParser(fileContent);
-
-                case SerializationFormat.Yaml:
-
-                    return new YamlResourceImportParser(fileContent);
-
-                default:
-
-                    throw new InvalidDataException("Resource import file is empty");
-            }
+            return new ResourceImportParser(fileContent);
         }
 
         /// <summary>
         /// Gets the resources to import.
         /// </summary>
         /// <returns>List of resources parsed from import file.</returns>
-        public abstract List<ResourceToImport> GetResourcesToImport();
+        public List<ResourceToImport> GetResourcesToImport()
+        {
+            return new DeserializerBuilder().Build().Deserialize<List<ResourceToImport>>(this.FileContent);
+        }
     }
 }

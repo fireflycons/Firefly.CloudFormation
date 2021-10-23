@@ -5,6 +5,7 @@
     using System.Linq;
 
     using Firefly.CloudFormation.Parsers;
+    using Firefly.CloudFormationParser;
 
     using FluentAssertions;
 
@@ -14,6 +15,7 @@
     /// Test the template parser
     /// </summary>
     /// <seealso cref="Xunit.IClassFixture{TemplateParserFixture}" />
+    [Collection("Sequential")]
     public class TemplateParser : IClassFixture<TemplateParserFixture>
     {
         /// <summary>
@@ -54,7 +56,7 @@
         /// <value>
         /// The parameters.
         /// </value>
-        public List<TemplateFileParameter> Parameters { get; private set; }
+        public List<IParameter> Parameters { get; private set; }
 
         /// <summary>
         /// Gets the resources.
@@ -62,7 +64,7 @@
         /// <value>
         /// The resources.
         /// </value>
-        public IEnumerable<ITemplateResource> Resources { get; private set; }
+        public IEnumerable<IResource> Resources { get; private set; }
 
         /// <summary>
         /// Gets the macro resources.
@@ -70,7 +72,7 @@
         /// <value>
         /// The macro resources.
         /// </value>
-        public IEnumerable<ITemplateResource> MacroResources { get; private set; }
+        public IEnumerable<IResource> MacroResources { get; private set; }
 
         /// <summary>
         /// Gets the template description.
@@ -199,7 +201,7 @@
         public void ShoudHaveVpcResource(string format)
         {
             this.Arrange(format);
-            this.Resources.First().ResourceType.Should().Be("AWS::EC2::VPC");
+            this.Resources.First().Type.Should().Be("AWS::EC2::VPC");
         }
 
         [Theory]
@@ -208,7 +210,7 @@
         public void ShoudHaveResourceNamedVpc(string format)
         {
             this.Arrange(format);
-            this.Resources.First().LogicalName.Should().Be("Vpc");
+            this.Resources.First().Name.Should().Be("Vpc");
         }
 
         [Theory]
@@ -217,7 +219,7 @@
         public void ShoudHaveMacroResourceNamedBucket(string format)
         {
             this.Arrange(format);
-            this.MacroResources.First().LogicalName.Should().Be("Bucket");
+            this.MacroResources.First().Name.Should().Be("Bucket");
         }
 
         /// <summary>

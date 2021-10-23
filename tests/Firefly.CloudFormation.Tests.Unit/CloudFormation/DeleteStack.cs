@@ -17,6 +17,7 @@
     using Xunit;
     using Xunit.Abstractions;
 
+    [Collection("Sequential")]
     public class DeleteStack : IClassFixture<TestStackFixture>
     {
         /// <summary>
@@ -51,7 +52,7 @@
         /// If the stack exists and is in the correct state, then it should be deleted.
         /// </summary>
         /// <param name="status">The status.</param>
-        [Theory]
+        [SkippableTheory]
         [InlineData("CREATE_COMPLETE")]
         [InlineData("IMPORT_COMPLETE")]
         [InlineData("ROLLBACK_COMPLETE")]
@@ -68,45 +69,45 @@
             mockCloudFormation.SetupSequence(cf => cf.DescribeStacksAsync(It.IsAny<DescribeStacksRequest>(), default))
                 .ReturnsAsync(
                     new DescribeStacksResponse
-                        {
-                            Stacks = new List<Stack>
+                    {
+                        Stacks = new List<Stack>
                                          {
                                              new Stack()
                                                  {
                                                      StackName = StackName, StackStatus = StackStatus.FindValue(status)
                                                  }
                                          }
-                        }).ReturnsAsync(
+                    }).ReturnsAsync(
                     new DescribeStacksResponse
-                        {
-                            Stacks = new List<Stack>
+                    {
+                        Stacks = new List<Stack>
                                          {
                                              new Stack()
                                                  {
                                                      StackName = StackName, StackStatus = StackStatus.FindValue(status)
                                                  }
                                          }
-                        }).ReturnsAsync(
+                    }).ReturnsAsync(
                     new DescribeStacksResponse
-                        {
-                            Stacks = new List<Stack>
+                    {
+                        Stacks = new List<Stack>
                                          {
                                              new Stack()
                                                  {
                                                      StackName = StackName, StackStatus = StackStatus.DELETE_IN_PROGRESS
                                                  }
                                          }
-                        }).ReturnsAsync(
+                    }).ReturnsAsync(
                     new DescribeStacksResponse
-                        {
-                            Stacks = new List<Stack>
+                    {
+                        Stacks = new List<Stack>
                                          {
                                              new Stack()
                                                  {
                                                      StackName = StackName, StackStatus = StackStatus.DELETE_COMPLETE
                                                  }
                                          }
-                        });
+                    });
 
             mockCloudFormation.Setup(cf => cf.DeleteStackAsync(It.IsAny<DeleteStackRequest>(), default))
                 .ReturnsAsync(new DeleteStackResponse());
@@ -114,8 +115,8 @@
             mockCloudFormation.SetupSequence(cf => cf.DescribeStackEventsAsync(It.IsAny<DescribeStackEventsRequest>(), default))
                 .ReturnsAsync(
                     new DescribeStackEventsResponse
-                        {
-                            StackEvents = new List<StackEvent>
+                    {
+                        StackEvents = new List<StackEvent>
                                               {
                                                   new StackEvent
                                                       {
@@ -125,11 +126,11 @@
                                                           Timestamp = DateTime.Now.AddDays(-1)
                                                       }
                                               }
-                        })
+                    })
                 .ReturnsAsync(
                     new DescribeStackEventsResponse
-                        {
-                            StackEvents = new List<StackEvent>
+                    {
+                        StackEvents = new List<StackEvent>
                                               {
                                                   new StackEvent
                                                       {
@@ -139,21 +140,21 @@
                                                           Timestamp = DateTime.Now.AddSeconds(1)
                                                       }
                                               }
-                        })
+                    })
                 .ReturnsAsync(
                 new DescribeStackEventsResponse
-                    {
-                        StackEvents = new List<StackEvent>()
-                    });
+                {
+                    StackEvents = new List<StackEvent>()
+                });
 
             mockCloudFormation.Setup(cf => cf.DescribeStackResourcesAsync(It.IsAny<DescribeStackResourcesRequest>(), default))
                 .ReturnsAsync(new DescribeStackResourcesResponse { StackResources = new List<StackResource>() });
 
             mockCloudFormation.Setup(cf => cf.GetTemplateAsync(It.IsAny<GetTemplateRequest>(), default)).ReturnsAsync(
                 new GetTemplateResponse
-                    {
-                        TemplateBody = this.fixture.TestStackJsonString
-                    });
+                {
+                    TemplateBody = this.fixture.TestStackJsonString
+                });
 
             mockClientFactory.Setup(f => f.CreateCloudFormationClient()).Returns(mockCloudFormation.Object);
             var runner = CloudFormationRunner.Builder(mockContext.Object, StackName)
@@ -220,20 +221,20 @@
                     {
                         Stacks = new List<Stack>
                                          {
-                                             new Stack()
-                                                 {
-                                                     StackName = StackName, StackStatus = StackStatus.FindValue(stackStatus)
-                                                 }
+                                                 new Stack()
+                                                     {
+                                                         StackName = StackName, StackStatus = StackStatus.FindValue(stackStatus)
+                                                     }
                                          }
                     }).ReturnsAsync(
                     new DescribeStacksResponse
                     {
                         Stacks = new List<Stack>
                                          {
-                                             new Stack()
-                                                 {
-                                                     StackName = StackName, StackStatus = StackStatus.FindValue(stackStatus)
-                                                 }
+                                                 new Stack()
+                                                     {
+                                                         StackName = StackName, StackStatus = StackStatus.FindValue(stackStatus)
+                                                     }
                                          }
                     });
 

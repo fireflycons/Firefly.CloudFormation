@@ -22,6 +22,7 @@
     /// Test <c>UpdateStack</c> calls.
     /// </summary>
     /// <seealso cref="Xunit.IClassFixture{Firefly.CloudFormation.Tests.Unit.CloudFormation.TestStackFixture}" />
+    [Collection("Sequential")]
     public class UpdateStack : IClassFixture<TestStackFixture>
     {
         /// <summary>
@@ -118,9 +119,9 @@
             mockCloudFormation.Setup(cf => cf.CreateChangeSetAsync(It.IsAny<CreateChangeSetRequest>(), default))
                 .ReturnsAsync(
                     new CreateChangeSetResponse
-                        {
-                            Id = "arn:aws:cloudformation:eu-west-1:123456789012:changeset/1234"
-                        });
+                    {
+                        Id = "arn:aws:cloudformation:eu-west-1:123456789012:changeset/1234"
+                    });
 
             mockCloudFormation
                 .SetupSequence(cf => cf.DescribeChangeSetAsync(It.IsAny<DescribeChangeSetRequest>(), default))
@@ -156,9 +157,9 @@
             mockCloudFormation.Setup(cf => cf.CreateChangeSetAsync(It.IsAny<CreateChangeSetRequest>(), default))
                 .ReturnsAsync(
                     new CreateChangeSetResponse
-                        {
-                            Id = "arn:aws:cloudformation:eu-west-1:123456789012:changeset/1234"
-                        });
+                    {
+                        Id = "arn:aws:cloudformation:eu-west-1:123456789012:changeset/1234"
+                    });
 
             mockCloudFormation
                 .SetupSequence(cf => cf.DescribeChangeSetAsync(It.IsAny<DescribeChangeSetRequest>(), default))
@@ -191,25 +192,25 @@
             mockCloudFormation.SetupSequence(cf => cf.DescribeStacksAsync(It.IsAny<DescribeStacksRequest>(), default))
                 .ReturnsAsync(
                     new DescribeStacksResponse
-                        {
-                            Stacks = new List<Stack>
+                    {
+                        Stacks = new List<Stack>
                                          {
                                              new Stack()
                                                  {
                                                      StackName = StackName, StackStatus = StackStatus.DELETE_IN_PROGRESS
                                                  }
                                          }
-                        }).ReturnsAsync(
+                    }).ReturnsAsync(
                     new DescribeStacksResponse
-                        {
-                            Stacks = new List<Stack>
+                    {
+                        Stacks = new List<Stack>
                                          {
                                              new Stack()
                                                  {
                                                      StackName = StackName, StackStatus = StackStatus.DELETE_IN_PROGRESS
                                                  }
                                          }
-                        });
+                    });
 
             mockClientFactory.Setup(f => f.CreateCloudFormationClient()).Returns(mockCloudFormation.Object);
 
@@ -247,8 +248,8 @@
             mockCloudFormation.SetupSequence(cf => cf.DescribeStacksAsync(It.IsAny<DescribeStacksRequest>(), default))
                 .ReturnsAsync(
                     new DescribeStacksResponse
-                        {
-                            Stacks = new List<Stack>
+                    {
+                        Stacks = new List<Stack>
                                          {
                                              new Stack()
                                                  {
@@ -256,10 +257,10 @@
                                                      StackStatus = StackStatus.FindValue(stackStatus)
                                                  }
                                          }
-                        }).ReturnsAsync(
+                    }).ReturnsAsync(
                     new DescribeStacksResponse
-                        {
-                            Stacks = new List<Stack>
+                    {
+                        Stacks = new List<Stack>
                                          {
                                              new Stack()
                                                  {
@@ -267,7 +268,7 @@
                                                      StackStatus = StackStatus.FindValue(stackStatus)
                                                  }
                                          }
-                        });
+                    });
 
             mockClientFactory.Setup(f => f.CreateCloudFormationClient()).Returns(mockCloudFormation.Object);
 
@@ -322,8 +323,8 @@
             mockCloudFormation.SetupSequence(cf => cf.DescribeStacksAsync(It.IsAny<DescribeStacksRequest>(), default))
                 .ReturnsAsync(
                     new DescribeStacksResponse
-                        {
-                            Stacks = new List<Stack>
+                    {
+                        Stacks = new List<Stack>
                                          {
                                              new Stack()
                                                  {
@@ -331,10 +332,10 @@
                                                      StackStatus = StackStatus.FindValue(stackStatus)
                                                  }
                                          }
-                        }).ReturnsAsync(
+                    }).ReturnsAsync(
                     new DescribeStacksResponse
-                        {
-                            Stacks = new List<Stack>
+                    {
+                        Stacks = new List<Stack>
                                          {
                                              new Stack()
                                                  {
@@ -342,7 +343,7 @@
                                                      StackStatus = StackStatus.FindValue(stackStatus)
                                                  }
                                          }
-                        });
+                    });
 
             mockClientFactory.Setup(f => f.CreateCloudFormationClient()).Returns(mockCloudFormation.Object);
 
@@ -375,9 +376,9 @@
             mockCloudFormation.Setup(cf => cf.CreateChangeSetAsync(It.IsAny<CreateChangeSetRequest>(), default))
                 .ReturnsAsync(
                     new CreateChangeSetResponse
-                        {
-                            Id = "arn:aws:cloudformation:eu-west-1:123456789012:changeset/1234"
-                        });
+                    {
+                        Id = "arn:aws:cloudformation:eu-west-1:123456789012:changeset/1234"
+                    });
 
             mockCloudFormation
                 .SetupSequence(cf => cf.DescribeChangeSetAsync(It.IsAny<DescribeChangeSetRequest>(), default))
@@ -408,8 +409,8 @@
                 .ReturnsAsync(ResponseStackCreateComplete)
                 .ReturnsAsync(
                     new DescribeStacksResponse
-                        {
-                            Stacks = new List<Stack>
+                    {
+                        Stacks = new List<Stack>
                                          {
                                              new Stack()
                                                  {
@@ -418,10 +419,10 @@
                                                      Parameters = new List<Parameter>()
                                                  }
                                          }
-                        }).ReturnsAsync(
+                    }).ReturnsAsync(
                     new DescribeStacksResponse
-                        {
-                            Stacks = new List<Stack>
+                    {
+                        Stacks = new List<Stack>
                                          {
                                              new Stack()
                                                  {
@@ -430,14 +431,14 @@
                                                      Parameters = new List<Parameter>()
                                                  }
                                          }
-                        });
+                    });
 
             mockCloudFormation
                 .SetupSequence(cf => cf.DescribeStackEventsAsync(It.IsAny<DescribeStackEventsRequest>(), default))
                 .ReturnsAsync(
                     new DescribeStackEventsResponse
-                        {
-                            StackEvents = new List<StackEvent>
+                    {
+                        StackEvents = new List<StackEvent>
                                               {
                                                   new StackEvent
                                                       {
@@ -447,21 +448,21 @@
                                                           Timestamp = DateTime.Now.AddDays(-1)
                                                       }
                                               }
-                        }).ReturnsAsync(
+                    }).ReturnsAsync(
                     new DescribeStackEventsResponse
-                        {
-                            StackEvents = new List<StackEvent>
+                    {
+                        StackEvents = new List<StackEvent>
                                               {
                                                   new StackEvent { Timestamp = DateTime.Now.AddSeconds(1) }
                                               }
-                        }).ReturnsAsync(
+                    }).ReturnsAsync(
                     new DescribeStackEventsResponse
-                        {
-                            StackEvents = new List<StackEvent>
+                    {
+                        StackEvents = new List<StackEvent>
                                               {
                                                   new StackEvent { Timestamp = DateTime.Now.AddSeconds(2) }
                                               }
-                        });
+                    });
 
             mockCloudFormation
                 .Setup(cf => cf.DescribeStackResourcesAsync(It.IsAny<DescribeStackResourcesRequest>(), default))
@@ -470,9 +471,9 @@
             mockCloudFormation.Setup(cf => cf.CreateChangeSetAsync(It.IsAny<CreateChangeSetRequest>(), default))
                 .ReturnsAsync(
                     new CreateChangeSetResponse
-                        {
-                            Id = "arn:aws:cloudformation:eu-west-1:123456789012:changeset/1234"
-                        });
+                    {
+                        Id = "arn:aws:cloudformation:eu-west-1:123456789012:changeset/1234"
+                    });
 
             mockCloudFormation
                 .SetupSequence(cf => cf.DescribeChangeSetAsync(It.IsAny<DescribeChangeSetRequest>(), default))
@@ -511,9 +512,9 @@
             mockCloudFormation.Setup(cf => cf.CreateChangeSetAsync(It.IsAny<CreateChangeSetRequest>(), default))
                 .ReturnsAsync(
                     new CreateChangeSetResponse
-                        {
-                            Id = "arn:aws:cloudformation:eu-west-1:123456789012:changeset/1234"
-                        });
+                    {
+                        Id = "arn:aws:cloudformation:eu-west-1:123456789012:changeset/1234"
+                    });
 
             mockCloudFormation
                 .SetupSequence(cf => cf.DescribeChangeSetAsync(It.IsAny<DescribeChangeSetRequest>(), default))
@@ -525,8 +526,8 @@
                 .SetupSequence(cf => cf.DescribeStackEventsAsync(It.IsAny<DescribeStackEventsRequest>(), default))
                 .ReturnsAsync(
                     new DescribeStackEventsResponse
-                        {
-                            StackEvents = new List<StackEvent>
+                    {
+                        StackEvents = new List<StackEvent>
                                               {
                                                   new StackEvent
                                                       {
@@ -536,7 +537,7 @@
                                                           Timestamp = DateTime.Now.AddDays(-1)
                                                       }
                                               }
-                        });
+                    });
 
             mockClientFactory.Setup(f => f.CreateCloudFormationClient()).Returns(mockCloudFormation.Object);
 
@@ -564,8 +565,8 @@
             mockCloudFormation.SetupSequence(cf => cf.DescribeStacksAsync(It.IsAny<DescribeStacksRequest>(), default))
                 .ReturnsAsync(ResponseStackCreateComplete).ReturnsAsync(ResponseStackCreateComplete).ReturnsAsync(
                     new DescribeStacksResponse
-                        {
-                            Stacks = new List<Stack>
+                    {
+                        Stacks = new List<Stack>
                                          {
                                              new Stack()
                                                  {
@@ -574,14 +575,14 @@
                                                      Parameters = new List<Parameter>()
                                                  }
                                          }
-                        });
+                    });
 
             mockCloudFormation.Setup(cf => cf.CreateChangeSetAsync(It.IsAny<CreateChangeSetRequest>(), default))
                 .ReturnsAsync(
                     new CreateChangeSetResponse
-                        {
-                            Id = "arn:aws:cloudformation:eu-west-1:123456789012:changeset/1234"
-                        });
+                    {
+                        Id = "arn:aws:cloudformation:eu-west-1:123456789012:changeset/1234"
+                    });
 
             mockCloudFormation
                 .SetupSequence(cf => cf.DescribeChangeSetAsync(It.IsAny<DescribeChangeSetRequest>(), default))
@@ -622,8 +623,8 @@
                 .ReturnsAsync(ResponseStackCreateComplete)
                 .ReturnsAsync(
                     new DescribeStacksResponse
-                        {
-                            Stacks = new List<Stack>
+                    {
+                        Stacks = new List<Stack>
                                          {
                                              new Stack()
                                                  {
@@ -632,10 +633,10 @@
                                                      Parameters = new List<Parameter>()
                                                  }
                                          }
-                        }).ReturnsAsync(
+                    }).ReturnsAsync(
                     new DescribeStacksResponse
-                        {
-                            Stacks = new List<Stack>
+                    {
+                        Stacks = new List<Stack>
                                          {
                                              new Stack()
                                                  {
@@ -644,14 +645,14 @@
                                                      Parameters = new List<Parameter>()
                                                  }
                                          }
-                        });
+                    });
 
             mockCloudFormation
                 .SetupSequence(cf => cf.DescribeStackEventsAsync(It.IsAny<DescribeStackEventsRequest>(), default))
                 .ReturnsAsync(
                     new DescribeStackEventsResponse
-                        {
-                            StackEvents = new List<StackEvent>
+                    {
+                        StackEvents = new List<StackEvent>
                                               {
                                                   new StackEvent
                                                       {
@@ -661,28 +662,28 @@
                                                           Timestamp = DateTime.Now.AddDays(-1)
                                                       }
                                               }
-                        }).ReturnsAsync(
+                    }).ReturnsAsync(
                     new DescribeStackEventsResponse
-                        {
-                            StackEvents = new List<StackEvent>
+                    {
+                        StackEvents = new List<StackEvent>
                                               {
                                                   new StackEvent { Timestamp = DateTime.Now.AddSeconds(1) }
                                               }
-                        }).ReturnsAsync(
+                    }).ReturnsAsync(
                     new DescribeStackEventsResponse
-                        {
-                            StackEvents = new List<StackEvent>
+                    {
+                        StackEvents = new List<StackEvent>
                                               {
                                                   new StackEvent { Timestamp = DateTime.Now.AddSeconds(2) }
                                               }
-                        }).ReturnsAsync(new DescribeStackEventsResponse { StackEvents = new List<StackEvent>() });
+                    }).ReturnsAsync(new DescribeStackEventsResponse { StackEvents = new List<StackEvent>() });
 
             mockCloudFormation.Setup(cf => cf.CreateChangeSetAsync(It.IsAny<CreateChangeSetRequest>(), default))
                 .ReturnsAsync(
                     new CreateChangeSetResponse
-                        {
-                            Id = "arn:aws:cloudformation:eu-west-1:123456789012:changeset/1234"
-                        });
+                    {
+                        Id = "arn:aws:cloudformation:eu-west-1:123456789012:changeset/1234"
+                    });
 
             mockCloudFormation
                 .SetupSequence(cf => cf.DescribeChangeSetAsync(It.IsAny<DescribeChangeSetRequest>(), default))
@@ -729,9 +730,9 @@
             mockCloudFormation.Setup(cf => cf.CreateChangeSetAsync(It.IsAny<CreateChangeSetRequest>(), default))
                 .ReturnsAsync(
                     new CreateChangeSetResponse
-                        {
-                            Id = "arn:aws:cloudformation:eu-west-1:123456789012:changeset/1234"
-                        });
+                    {
+                        Id = "arn:aws:cloudformation:eu-west-1:123456789012:changeset/1234"
+                    });
 
             mockCloudFormation
                 .SetupSequence(cf => cf.DescribeChangeSetAsync(It.IsAny<DescribeChangeSetRequest>(), default))

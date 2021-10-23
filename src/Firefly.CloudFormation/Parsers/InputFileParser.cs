@@ -1,7 +1,5 @@
 ﻿namespace Firefly.CloudFormation.Parsers
 {
-    using Firefly.CloudFormation.Model;
-
     /// <summary>
     /// Base class for all YAML/JSON parser types
     /// </summary>
@@ -23,22 +21,5 @@
         /// The template body.
         /// </value>
         protected string FileContent { get; }
-
-        /// <summary>
-        /// Gets the input file format.
-        /// </summary>
-        /// <param name="fileContent">The file content to guess the format of.</param>
-        /// <returns>The input file format</returns>
-        protected static SerializationFormat GetInputFileFormat(string fileContent)
-        {
-            var body = fileContent.Trim();
-
-            if (body.Length == 0)
-            {
-                return SerializationFormat.Unknown;
-            }
-
-            return body[0] == '[' || body[0] == '{' ? SerializationFormat.Json : SerializationFormat.Yaml;
-        }
     }
 }
