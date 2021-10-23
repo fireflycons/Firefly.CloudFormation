@@ -23,23 +23,23 @@
         [EmbeddedResource("test-resource-update.yaml")]
         private static string testResourceUpdateYaml;
 
-        [Fact]
-        public void UpdateJsonResource()
-        {
-            const string S3Location = "s3://bucket/job.etl";
+        //[Fact]
+        //public void UpdateJsonResource()
+        //{
+        //    const string S3Location = "s3://bucket/job.etl";
 
-            var parser = Firefly.CloudFormation.Parsers.TemplateParser.Create(testResourceUpdateJson);
-            var resources = parser.GetResources();
+        //    var parser = Firefly.CloudFormation.Parsers.TemplateParser.Create(testResourceUpdateJson);
+        //    var resources = parser.GetResources();
 
-            var resource = resources.First(r => r.Name == "MyJob");
+        //    var resource = resources.First(r => r.Name == "MyJob");
 
-            // resource.UpdateResourceProperty("Code", new { S3Bucket = "bucket-name", S3Key = "code/lambda.zip" });
-            resource.UpdateResourceProperty("Command.ScriptLocation", S3Location);
-            var modifiedTemplate = parser.GetTemplate();
+        //    // resource.UpdateResourceProperty("Code", new { S3Bucket = "bucket-name", S3Key = "code/lambda.zip" });
+        //    resource.UpdateResourceProperty("Command.ScriptLocation", S3Location);
+        //    var modifiedTemplate = parser.GetTemplate();
 
-            modifiedTemplate.Should().Contain($"ScriptLocation: {S3Location}");
-            resource.GetResourcePropertyValue("Command.ScriptLocation").Should().Be(S3Location);
-        }
+        //    modifiedTemplate.Should().Contain($"ScriptLocation: {S3Location}");
+        //    resource.GetResourcePropertyValue("Command.ScriptLocation").Should().Be(S3Location);
+        //}
 
         [Fact]
         public void UpdateYamlResource()
