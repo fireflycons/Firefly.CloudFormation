@@ -60,7 +60,6 @@
         [InlineData("UPDATE_ROLLBACK_COMPLETE")]
         public async void ShouldDeleteStackIfStackExistsAndIsInCorrectState(string status)
         {
-            //Skip.If(true, "getting stick in Appveyor");
             var logger = new TestLogger(this.output);
             var mockClientFactory = TestHelpers.GetClientFactoryMock();
             var mockContext = TestHelpers.GetContextMock(logger);
@@ -167,87 +166,87 @@
             logger.StackEvents.Count.Should().BeGreaterThan(0);
         }
 
-        //    /// <summary>
-        //    /// If the stack does not exist, delete should fail
-        //    /// </summary>
-        //    [Fact]
-        //    public void ShouldFailIfStackDoesNotExist()
-        //    {
-        //        var logger = new TestLogger(this.output);
-        //        var mockClientFactory = TestHelpers.GetClientFactoryMock();
-        //        var mockContext = TestHelpers.GetContextMock(logger);
+        /// <summary>
+        /// If the stack does not exist, delete should fail
+        /// </summary>
+        [Fact]
+        public void ShouldFailIfStackDoesNotExist()
+        {
+            var logger = new TestLogger(this.output);
+            var mockClientFactory = TestHelpers.GetClientFactoryMock();
+            var mockContext = TestHelpers.GetContextMock(logger);
 
-        //        var mockCloudFormation = new Mock<IAmazonCloudFormation>();
-        //        mockCloudFormation.Setup(cf => cf.DescribeStacksAsync(It.IsAny<DescribeStacksRequest>(), default)).Throws(
-        //            new AmazonCloudFormationException($"Stack with id {StackName} does not exist"));
+            var mockCloudFormation = new Mock<IAmazonCloudFormation>();
+            mockCloudFormation.Setup(cf => cf.DescribeStacksAsync(It.IsAny<DescribeStacksRequest>(), default)).Throws(
+                new AmazonCloudFormationException($"Stack with id {StackName} does not exist"));
 
-        //        mockClientFactory.Setup(f => f.CreateCloudFormationClient()).Returns(mockCloudFormation.Object);
+            mockClientFactory.Setup(f => f.CreateCloudFormationClient()).Returns(mockCloudFormation.Object);
 
-        //        var runner = CloudFormationRunner.Builder(mockContext.Object, StackName)
-        //            .WithClientFactory(mockClientFactory.Object)
-        //            .WithFollowOperation()
-        //            .Build();
+            var runner = CloudFormationRunner.Builder(mockContext.Object, StackName)
+                .WithClientFactory(mockClientFactory.Object)
+                .WithFollowOperation()
+                .Build();
 
-        //        Func<Task<CloudFormationResult>> action = async () => await runner.DeleteStackAsync();
+            Func<Task<CloudFormationResult>> action = async () => await runner.DeleteStackAsync();
 
-        //        action.Should().Throw<StackOperationException>().And.OperationalState.Should().Be(StackOperationalState.NotFound);
-        //    }
+            action.Should().Throw<StackOperationException>().And.OperationalState.Should().Be(StackOperationalState.NotFound);
+        }
 
-        //    /// <summary>
-        //    /// Stack delete should fail if stack is not in correct state
-        //    /// </summary>
-        //    /// <param name="stackStatus">The stack status.</param>
-        //    /// <param name="expectedOutcome">Expected outcome</param>
-        //    [Theory]
-        //    [InlineData("CREATE_IN_PROGRESS", StackOperationalState.Busy)]
-        //    [InlineData("IMPORT_IN_PROGRESS", StackOperationalState.Busy)]
-        //    [InlineData("IMPORT_ROLLBACK_IN_PROGRESS", StackOperationalState.Busy)]
-        //    [InlineData("REVIEW_IN_PROGRESS", StackOperationalState.Busy)]
-        //    [InlineData("ROLLBACK_IN_PROGRESS", StackOperationalState.Busy)]
-        //    [InlineData("UPDATE_COMPLETE_CLEANUP_IN_PROGRESS", StackOperationalState.Busy)]
-        //    [InlineData("UPDATE_IN_PROGRESS", StackOperationalState.Busy)]
-        //    [InlineData("UPDATE_ROLLBACK_COMPLETE_CLEANUP_IN_PROGRESS", StackOperationalState.Busy)]
-        //    [InlineData("UPDATE_ROLLBACK_IN_PROGRESS", StackOperationalState.Busy)]
+        /// <summary>
+        /// Stack delete should fail if stack is not in correct state
+        /// </summary>
+        /// <param name="stackStatus">The stack status.</param>
+        /// <param name="expectedOutcome">Expected outcome</param>
+        [Theory]
+        [InlineData("CREATE_IN_PROGRESS", StackOperationalState.Busy)]
+        [InlineData("IMPORT_IN_PROGRESS", StackOperationalState.Busy)]
+        [InlineData("IMPORT_ROLLBACK_IN_PROGRESS", StackOperationalState.Busy)]
+        [InlineData("REVIEW_IN_PROGRESS", StackOperationalState.Busy)]
+        [InlineData("ROLLBACK_IN_PROGRESS", StackOperationalState.Busy)]
+        [InlineData("UPDATE_COMPLETE_CLEANUP_IN_PROGRESS", StackOperationalState.Busy)]
+        [InlineData("UPDATE_IN_PROGRESS", StackOperationalState.Busy)]
+        [InlineData("UPDATE_ROLLBACK_COMPLETE_CLEANUP_IN_PROGRESS", StackOperationalState.Busy)]
+        [InlineData("UPDATE_ROLLBACK_IN_PROGRESS", StackOperationalState.Busy)]
 
-        //    public void ShouldFailIfStackIsBrokenOrBusy(string stackStatus, StackOperationalState expectedOutcome)
-        //    {
-        //        var logger = new TestLogger(this.output);
-        //        var mockClientFactory = TestHelpers.GetClientFactoryMock();
-        //        var mockContext = TestHelpers.GetContextMock(logger);
-        //        var mockCloudFormation = new Mock<IAmazonCloudFormation>();
+        public void ShouldFailIfStackIsBrokenOrBusy(string stackStatus, StackOperationalState expectedOutcome)
+        {
+            var logger = new TestLogger(this.output);
+            var mockClientFactory = TestHelpers.GetClientFactoryMock();
+            var mockContext = TestHelpers.GetContextMock(logger);
+            var mockCloudFormation = new Mock<IAmazonCloudFormation>();
 
-        //        mockCloudFormation.SetupSequence(cf => cf.DescribeStacksAsync(It.IsAny<DescribeStacksRequest>(), default))
-        //            .ReturnsAsync(
-        //                new DescribeStacksResponse
-        //                {
-        //                    Stacks = new List<Stack>
-        //                                     {
-        //                                         new Stack()
-        //                                             {
-        //                                                 StackName = StackName, StackStatus = StackStatus.FindValue(stackStatus)
-        //                                             }
-        //                                     }
-        //                }).ReturnsAsync(
-        //                new DescribeStacksResponse
-        //                {
-        //                    Stacks = new List<Stack>
-        //                                     {
-        //                                         new Stack()
-        //                                             {
-        //                                                 StackName = StackName, StackStatus = StackStatus.FindValue(stackStatus)
-        //                                             }
-        //                                     }
-        //                });
+            mockCloudFormation.SetupSequence(cf => cf.DescribeStacksAsync(It.IsAny<DescribeStacksRequest>(), default))
+                .ReturnsAsync(
+                    new DescribeStacksResponse
+                    {
+                        Stacks = new List<Stack>
+                                         {
+                                                 new Stack()
+                                                     {
+                                                         StackName = StackName, StackStatus = StackStatus.FindValue(stackStatus)
+                                                     }
+                                         }
+                    }).ReturnsAsync(
+                    new DescribeStacksResponse
+                    {
+                        Stacks = new List<Stack>
+                                         {
+                                                 new Stack()
+                                                     {
+                                                         StackName = StackName, StackStatus = StackStatus.FindValue(stackStatus)
+                                                     }
+                                         }
+                    });
 
-        //        mockClientFactory.Setup(f => f.CreateCloudFormationClient()).Returns(mockCloudFormation.Object);
+            mockClientFactory.Setup(f => f.CreateCloudFormationClient()).Returns(mockCloudFormation.Object);
 
-        //        var runner = CloudFormationRunner.Builder(mockContext.Object, StackName)
-        //            .WithClientFactory(mockClientFactory.Object)
-        //            .Build();
+            var runner = CloudFormationRunner.Builder(mockContext.Object, StackName)
+                .WithClientFactory(mockClientFactory.Object)
+                .Build();
 
-        //        Func<Task<CloudFormationResult>> action = async () => await runner.DeleteStackAsync();
+            Func<Task<CloudFormationResult>> action = async () => await runner.DeleteStackAsync();
 
-        //        action.Should().Throw<StackOperationException>().And.OperationalState.Should().Be(expectedOutcome);
-        //    }
+            action.Should().Throw<StackOperationException>().And.OperationalState.Should().Be(expectedOutcome);
+        }
     }
 }
