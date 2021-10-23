@@ -18,8 +18,8 @@
 
         public ParameterFileParserFixture()
         {
-            var jsonParser = Firefly.CloudFormation.Parsers.ParameterFileParser.CreateParser(this.jsonParameterFile);
-            var yamlParser = Firefly.CloudFormation.Parsers.ParameterFileParser.CreateParser(this.yamlParameterFile);
+            var jsonParser = Firefly.CloudFormation.Parsers.ParameterFileParser.Create(this.jsonParameterFile);
+            var yamlParser = Firefly.CloudFormation.Parsers.ParameterFileParser.Create(this.yamlParameterFile);
 
             this.JsonParameters = jsonParser.ParseParameterFile();
             this.YamlParameters = yamlParser.ParseParameterFile();

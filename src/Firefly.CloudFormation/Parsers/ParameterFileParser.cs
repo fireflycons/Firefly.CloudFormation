@@ -1,5 +1,6 @@
 ﻿namespace Firefly.CloudFormation.Parsers
 {
+    using System;
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
@@ -34,9 +35,21 @@
         /// <param name="templateBody">The template body.</param>
         /// <returns>A new <see cref="ParameterFileParser"/></returns>
         /// <exception cref="InvalidDataException">Parameter file is empty is empty</exception>
-        public static IParameterFileParser CreateParser(string templateBody)
+        public static IParameterFileParser Create(string templateBody)
         {
             return new ParameterFileParser(templateBody);
+        }
+
+        /// <summary>
+        /// Creates a parser subclass of the appropriate type for the input content.
+        /// </summary>
+        /// <param name="templateBody">The template body.</param>
+        /// <returns>A new <see cref="ParameterFileParser"/></returns>
+        /// <exception cref="InvalidDataException">Parameter file is empty is empty</exception>
+        [Obsolete("Use method 'Create' instead.")]
+        public static IParameterFileParser CreateParser(string templateBody)
+        {
+            return Create(templateBody);
         }
 
         /// <summary>

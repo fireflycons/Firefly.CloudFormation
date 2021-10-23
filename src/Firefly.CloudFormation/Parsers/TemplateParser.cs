@@ -4,16 +4,9 @@
     using System.IO;
     using System.Text;
 
-    using Firefly.CloudFormation.Model;
     using Firefly.CloudFormationParser;
     using Firefly.CloudFormationParser.Serialization.Settings;
     using Firefly.CloudFormationParser.TemplateObjects;
-
-    using Newtonsoft.Json;
-    using Newtonsoft.Json.Linq;
-
-    using YamlDotNet.RepresentationModel;
-    using YamlDotNet.Serialization;
 
     /// <summary>
     /// Base class for CloudFormation template parsers.
@@ -42,71 +35,9 @@
         /// <exception cref="InvalidDataException">Template body is empty</exception>
         public static ITemplateParser Create(string templateBody)
         {
-            using (var settings = new StringDeserializerSettings(templateBody))
+            using (var settings = new DeserializerSettingsBuilder().WithTemplateString(templateBody).Build())
             {
                 return new TemplateParser(Template.Deserialize(settings).Result);
-            }
-        }
-
-        /// <summary>
-        /// Serializes an object graph to JSON or YAML string
-        /// </summary>
-        /// <param name="objectGraph">The object graph.</param>
-        /// <param name="format">The required serialization format.</param>
-        /// <returns>Object graph serialized to string in requested format.</returns>
-        // ReSharper disable once UnusedMember.Global - Provided as an API method for clients of this module.
-        public static string SerializeObjectGraphToString(object objectGraph, SerializationFormat format)
-        {
-            switch (format)
-            {
-                case SerializationFormat.Json:
-
-                    return JsonConvert.SerializeObject(objectGraph, Formatting.Indented);
-
-                case SerializationFormat.Yaml:
-
-                    return new SerializerBuilder().Build().Serialize(objectGraph);
-
-                default:
-
-                    throw new System.InvalidOperationException($"Unsupported format: {format}");
-            }
-        }
-
-        /// <summary>
-        /// Serializes the object graph to representation model.
-        /// </summary>
-        /// <param name="objectGraph">The object graph.</param>
-        /// <param name="format">The format.</param>
-        /// <returns>Either a <see cref="YamlNode"/> or a <see cref="JObject"/> depending on requested format.</returns>
-        /// <exception cref="System.InvalidOperationException">Unsupported format: {format}</exception>
-        public static object SerializeObjectGraphToRepresentationModel(object objectGraph, SerializationFormat format)
-        {
-            switch (format)
-            {
-                case SerializationFormat.Json:
-
-                    if (objectGraph == null || objectGraph is string)
-                    {
-                        return new JValue(objectGraph);
-                    }
-
-                    return JObject.Parse(JsonConvert.SerializeObject(objectGraph, Formatting.Indented));
-
-                case SerializationFormat.Yaml:
-
-                    var yaml = new YamlStream();
-
-                    using (var sr = new StringReader(new SerializerBuilder().Build().Serialize(objectGraph)))
-                    {
-                        yaml.Load(sr);
-                    }
-
-                    return yaml.Documents[0].RootNode;
-
-                default:
-
-                    throw new System.InvalidOperationException($"Unsupported format: {format}");
             }
         }
 
