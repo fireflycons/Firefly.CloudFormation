@@ -1,4 +1,8 @@
-# 1.0.8 
+# 2.0.0
+
+* Enhancement - Switch over to new [template parser](https://github.com/fireflycons/Firefly.CloudFormationParser). Introduces a few [breaking changes](https://fireflycons.github.io/Firefly-CloudFormation/documentation/v2-breaking.html). [Issue link](https://github.com/fireflycons/Firefly.CloudFormation/issues/18)
+
+# 1.0.8
 
 * Fix - MaxLength for string params less than min length - introduced by previous change. [Issue link](https://github.com/fireflycons/Firefly.CloudFormation/issues/17)
 # 1.0.7
