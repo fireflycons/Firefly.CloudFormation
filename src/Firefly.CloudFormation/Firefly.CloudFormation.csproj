@@ -29,12 +29,12 @@ Supports Source Link
     <PackageReference Include="Polly.Contrib.WaitAndRetry" Version="1.1.1" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(SolutionName)' == 'Firefly.CloudFormation.debug'">
+  <ItemGroup Condition="$(SolutionName.EndsWith ('debug'))">
     <ProjectReference Include="..\..\..\Firefly.CloudFormationParser\src\Firefly.CloudFormationParser\Firefly.CloudFormationParser.csproj" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(SolutionName)' != 'Firefly.CloudFormation.debug'">
-    <PackageReference Include="Firefly.CloudFormationParser" Version="0.1.0" />
+  <ItemGroup Condition="!$(SolutionName.EndsWith ('debug'))">
+    <PackageReference Include="Firefly.CloudFormationParser" Version="0.1.1" />
   </ItemGroup>
 
   <ItemGroup>
