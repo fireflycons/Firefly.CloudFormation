@@ -1,6 +1,7 @@
 ﻿namespace Firefly.CloudFormation.Tests.Unit.CloudFormation
 {
     using System;
+    using System.Collections.Generic;
     using System.Threading.Tasks;
 
     using Amazon.CloudFormation;
@@ -35,6 +36,9 @@
 
             mockCf.Setup(cf => cf.GetTemplateAsync(It.IsAny<GetTemplateRequest>(), default)).ReturnsAsync(
                 new GetTemplateResponse { TemplateBody = this.fixture.TestStackJsonString });
+
+            mockCf.Setup(cf => cf.GetTemplateSummaryAsync(It.IsAny<GetTemplateSummaryRequest>(), default))
+                .ReturnsAsync(new GetTemplateSummaryResponse { Parameters = new List<ParameterDeclaration>() });
 
             var mockClientFactory = new Mock<IAwsClientFactory>();
 

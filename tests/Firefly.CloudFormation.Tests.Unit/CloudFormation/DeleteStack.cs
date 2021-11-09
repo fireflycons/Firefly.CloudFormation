@@ -156,6 +156,9 @@
                     TemplateBody = this.fixture.TestStackJsonString
                 });
 
+            mockCloudFormation.Setup(cf => cf.GetTemplateSummaryAsync(It.IsAny<GetTemplateSummaryRequest>(), default))
+                .ReturnsAsync(new GetTemplateSummaryResponse { Parameters = new List<ParameterDeclaration>() });
+
             mockClientFactory.Setup(f => f.CreateCloudFormationClient()).Returns(mockCloudFormation.Object);
             var runner = CloudFormationRunner.Builder(mockContext.Object, StackName)
                 .WithClientFactory(mockClientFactory.Object)
