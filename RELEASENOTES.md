@@ -1,3 +1,7 @@
+# 2.1.0
+
+* Enhancement - Update to 0.3.0 of Firfly.CloudFormationParser
+
 # 2.0.0
 
 * Enhancement - Switch over to new [template parser](https://github.com/fireflycons/Firefly.CloudFormationParser). Introduces a few [breaking changes](https://fireflycons.github.io/Firefly-CloudFormation/documentation/v2-breaking.html). [Issue link](https://github.com/fireflycons/Firefly.CloudFormation/issues/18)
