@@ -208,16 +208,16 @@
                         if (Regex.IsMatch(uri.Host, @"^s3[\.-]", RegexOptions.IgnoreCase))
                         {
                             // Path style
-                            // Min of 2 actual path segments required for path style URI - first segment is always '/'
+                            // Min of 3 actual path segments required for path style URI - first segment is always '/'
                             if (uri.Segments.Length < 3)
                             {
                                 throw new ArgumentException(
                                     // ReSharper disable once StringLiteralTypo
-                                    "'Path' style S3 URLs must have at least 2 path segments (bucketname/key)");
+                                    "'Path' style S3 URLs must have at least 3 path segments (bucketname/key)");
                             }
 
-                            bucketName = uri.Segments[0].TrimEnd('/');
-                            key = string.Join(string.Empty, uri.Segments.Skip(1));
+                            bucketName = uri.Segments[1].TrimEnd('/');
+                            key = string.Join(string.Empty, uri.Segments.Skip(2));
                         }
                         else
                         {

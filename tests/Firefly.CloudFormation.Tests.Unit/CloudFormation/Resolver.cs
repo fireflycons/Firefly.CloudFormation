@@ -188,7 +188,7 @@
             Func<Task> action = async () => await resolver.ResolveFileAsync(url);
 
             action.Should().Throw<ArgumentException>().WithMessage(
-                "'Path' style S3 URLs must have at least 2 path segments (bucketname/key)");
+                "'Path' style S3 URLs must have at least 3 path segments (bucketname/key)");
         }
 
         [Fact]
