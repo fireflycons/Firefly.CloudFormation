@@ -1,3 +1,7 @@
+# 2.1.2
+
+* No significant change - Bumped version of Firefly.CloudFormationParser to 0.3.1
+
 # 2.1.1
 
 * Fix - Exception "BucketName is a required property and must be set before making this call" when using path-syle S3 https url. [Issue link](https://github.com/fireflycons/Firefly.CloudFormation/issues/20)
