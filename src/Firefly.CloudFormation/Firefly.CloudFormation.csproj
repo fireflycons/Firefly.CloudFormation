@@ -34,7 +34,7 @@ Supports Source Link
   </ItemGroup>
 
   <ItemGroup Condition="!$(SolutionName.EndsWith ('debug'))">
-    <PackageReference Include="Firefly.CloudFormationParser" Version="0.3.1" />
+    <PackageReference Include="Firefly.CloudFormationParser" Version="0.3.2" />
   </ItemGroup>
 
   <ItemGroup>
