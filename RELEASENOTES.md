@@ -1,4 +1,8 @@
-# 2.1.3
+# 2.1.4
+
+* No functional change - Bumped version of Firefly.CloudFormationParser to 0.3.3 due to another ocurrence of the issue below.
+
+# 2.1.3 (Delisted)
 
 * No functional change - Bumped version of Firefly.CloudFormationParser to 0.3.2 in response to [this bug in the parser/serializer](https://github.com/fireflycons/Firefly.CloudFormationParser/issues/4)
 
