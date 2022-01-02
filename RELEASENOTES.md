@@ -1,3 +1,7 @@
+# 2.1.5
+
+* No functional change - Bumped version of Firefly.CloudFormationParser to 0.3.4 due issue with !Join rendering.
+
 # 2.1.4
 
 * No functional change - Bumped version of Firefly.CloudFormationParser to 0.3.3 due to another ocurrence of the issue below.
